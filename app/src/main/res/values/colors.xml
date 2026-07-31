@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="stride_primary">#5B5CE2</color>
+    <color name="stride_surface">#F8F8FC</color>
+    <color name="stride_text">#1D1B20</color>
+</resources>
+
