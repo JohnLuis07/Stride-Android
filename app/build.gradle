@@ -4,6 +4,10 @@ android {
     namespace 'com.stride.android'
     compileSdk 35
 
+    buildFeatures {
+        viewBinding true
+    }
+
     defaultConfig {
         applicationId 'com.stride.android'
         minSdk 24
@@ -12,4 +16,3 @@ android {
         versionName '1.0.0'
     }
 }
-
