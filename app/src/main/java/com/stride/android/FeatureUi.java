@@ -1,38 +1,35 @@
 package com.stride.android;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.text.InputType;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import org.json.JSONObject;
+import com.stride.android.databinding.DialogFormBinding;
+import com.stride.android.databinding.ViewEntityRowBinding;
+import com.stride.android.databinding.ViewTextInputBinding;
+import com.stride.android.databinding.ViewTextBinding;
 
 /** Reusable Android view helpers used by feature controllers. */
 final class FeatureUi {
-    static final int PRIMARY = Color.rgb(91, 92, 226);
-    static final int INK = Color.rgb(29, 27, 32);
-    static final int MUTED = Color.rgb(98, 99, 112);
+    static final int PRIMARY = 0xff5b5ce2;
+    static final int INK = 0xff1d1b20;
+    static final int MUTED = 0xff626370;
     private final Activity activity;
 
     FeatureUi(Activity activity) { this.activity = activity; }
     int dp(int value) { return (int) (value * activity.getResources().getDisplayMetrics().density + .5f); }
     void toast(String value) { Toast.makeText(activity, value, Toast.LENGTH_LONG).show(); }
-    TextView text(String value, int size, int color) { TextView view = new TextView(activity); view.setText(value); view.setTextSize(size); view.setTextColor(color); return view; }
-    void spacer(LinearLayout parent, int value) { Space view = new Space(activity); parent.addView(view, new LinearLayout.LayoutParams(1, dp(value))); }
-    LinearLayout dialogForm() { LinearLayout form = new LinearLayout(activity); form.setOrientation(LinearLayout.VERTICAL); form.setPadding(dp(18), dp(6), dp(18), 0); return form; }
-    EditText field(String hint, int type) { EditText input = new EditText(activity); input.setHint(hint); input.setTextSize(16); input.setTextColor(INK); input.setInputType(type); input.setPadding(dp(12), dp(10), dp(12), dp(10)); input.setBackground(round(Color.WHITE, 12)); LinearLayout.LayoutParams layout = new LinearLayout.LayoutParams(-1, -2); layout.setMargins(0, 0, 0, dp(8)); input.setLayoutParams(layout); return input; }
-    void row(LinearLayout parent, String title, String subtitle, View.OnClickListener click) { LinearLayout row = new LinearLayout(activity); row.setOrientation(LinearLayout.VERTICAL); row.setPadding(dp(16), dp(13), dp(16), dp(13)); row.setBackground(round(Color.WHITE, 16)); row.setOnClickListener(click); TextView heading = text(title, 18, INK); heading.setTypeface(null, Typeface.BOLD); row.addView(heading); if (!subtitle.isEmpty()) { spacer(row, 4); row.addView(text(subtitle, 14, MUTED)); } parent.addView(row); spacer(parent, 9); }
-    private GradientDrawable round(int color, int radius) { GradientDrawable drawable = new GradientDrawable(); drawable.setColor(color); drawable.setCornerRadius(dp(radius)); return drawable; }
+    TextView text(String value, int size, int color) { ViewTextBinding binding=ViewTextBinding.inflate(activity.getLayoutInflater()); binding.textView.setText(value); binding.textView.setTextSize(size); binding.textView.setTextColor(color); return binding.textView; }
+    LinearLayout dialogForm() { return DialogFormBinding.inflate(activity.getLayoutInflater()).dialogFormContainer; }
+    EditText field(String hint, int type) { ViewTextInputBinding binding=ViewTextInputBinding.inflate(activity.getLayoutInflater()); binding.textInput.setHint(hint); binding.textInput.setInputType(type); return binding.textInput; }
+    void row(LinearLayout parent, String title, String subtitle, View.OnClickListener click) { ViewEntityRowBinding binding=ViewEntityRowBinding.inflate(activity.getLayoutInflater(),parent,false); binding.entityTitle.setText(title); binding.entitySubtitle.setText(subtitle); binding.entitySubtitle.setVisibility(subtitle.isEmpty()?View.GONE:View.VISIBLE); binding.entityRow.setOnClickListener(click); parent.addView(binding.getRoot()); }
     static String now() { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US).format(new Date()); }
     static String today() { return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date()); }
     static String strip(String value) { return value.replaceAll("<[^>]*>", "").replace("&nbsp;", " "); }

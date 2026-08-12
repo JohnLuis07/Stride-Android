@@ -1,7 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Shared screen host. Individual workspace pages are rendered into this host. -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/screen_root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/stride_surface" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/screen_root" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/stride_surface">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="72dp" android:background="@color/stride_primary" android:gravity="center_vertical" android:paddingLeft="8dp" android:paddingRight="10dp">
+            <Button android:id="@+id/back_button" android:layout_width="48dp" android:layout_height="52dp" android:background="@android:color/transparent" android:text="‹" android:textColor="@android:color/white" android:textSize="29sp" android:visibility="gone" />
+            <TextView android:id="@+id/toolbar_title" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="✦  Stride." android:textColor="@android:color/white" android:textSize="24sp" android:textStyle="bold" />
+            <Button android:id="@+id/menu_button" android:layout_width="54dp" android:layout_height="52dp" android:background="@android:color/transparent" android:text="☰" android:textColor="@android:color/white" android:textSize="25sp" />
+        </LinearLayout>
+        <FrameLayout android:id="@+id/content_host" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
+    </LinearLayout>
+    <FrameLayout android:id="@+id/drawer_overlay" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#66000000" android:visibility="gone">
+        <LinearLayout android:id="@+id/drawer_panel" android:layout_width="310dp" android:layout_height="match_parent" android:background="@android:color/white" android:orientation="vertical" android:padding="20dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✦  Stride." android:textColor="@color/stride_primary" android:textSize="28sp" android:textStyle="bold" />
+            <TextView android:id="@+id/drawer_identity" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:textColor="@color/stride_muted" android:textSize="14sp" />
+            <Button android:id="@+id/nav_overview" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="24dp" android:background="@drawable/bg_secondary_button" android:text="⌂   Overview" />
+            <Button android:id="@+id/nav_notes" android:layout_width="match_parent" android:layout_height="48dp" android:background="@drawable/bg_secondary_button" android:text="✎   Notes" />
+            <Button android:id="@+id/nav_calendar" android:layout_width="match_parent" android:layout_height="48dp" android:background="@drawable/bg_secondary_button" android:text="□   Calendar" />
+            <Button android:id="@+id/nav_tasks" android:layout_width="match_parent" android:layout_height="48dp" android:background="@drawable/bg_secondary_button" android:text="✓   Tasks" />
+            <Button android:id="@+id/nav_goals" android:layout_width="match_parent" android:layout_height="48dp" android:background="@drawable/bg_secondary_button" android:text="◎   Goals" />
+            <Button android:id="@+id/nav_focus" android:layout_width="match_parent" android:layout_height="48dp" android:background="@drawable/bg_secondary_button" android:text="◷   Focus" />
+            <Button android:id="@+id/nav_settings" android:layout_width="match_parent" android:layout_height="48dp" android:background="@drawable/bg_secondary_button" android:text="⚙   Settings" />
+            <Space android:layout_width="1dp" android:layout_height="0dp" android:layout_weight="1" />
+            <Button android:id="@+id/nav_logout" android:layout_width="match_parent" android:layout_height="48dp" android:background="@drawable/bg_secondary_button" android:text="⇥   Log out" android:textColor="#B8374B" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

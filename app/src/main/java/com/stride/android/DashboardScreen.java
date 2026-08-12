@@ -20,6 +20,7 @@ final class DashboardScreen implements FeatureScreen {
     LinearLayout calendarCard() { return binding.calendarCard; }
     LinearLayout tasksCard() { return binding.tasksCard; }
     LinearLayout goalsCard() { return binding.goalsCard; }
+    LinearLayout focusCard() { return binding.focusCard; }
     Button notesButton() { return binding.openNotes; }
     Button calendarButton() { return binding.openCalendar; }
     Button tasksButton() { return binding.openTasks; }
@@ -33,6 +34,7 @@ final class DashboardScreen implements FeatureScreen {
         calendarCard().setVisibility(visible(features,"Calendar") ? View.VISIBLE : View.GONE);
         tasksCard().setVisibility(visible(features,"Todo") ? View.VISIBLE : View.GONE);
         goalsCard().setVisibility(visible(features,"Goals") ? View.VISIBLE : View.GONE);
+        focusCard().setVisibility(View.VISIBLE);
         notesButton().setOnClickListener(v -> notes.run()); calendarButton().setOnClickListener(v -> calendar.run()); tasksButton().setOnClickListener(v -> tasks.run()); goalsButton().setOnClickListener(v -> goals.run()); focusButton().setOnClickListener(v -> focus.run());
     }
     private boolean visible(String features, String feature) { return features.isEmpty() || features.contains(feature); }
