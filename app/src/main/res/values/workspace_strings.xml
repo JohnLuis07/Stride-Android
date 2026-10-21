@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="workspace_overview">Overview</string>
+    <string name="workspace_tasks">Tasks</string>
+    <string name="workspace_calendar">Calendar</string>
+    <string name="workspace_notes">Notes</string>
+    <string name="workspace_goals">Goals</string>
+    <string name="workspace_focus">Focus</string>
+    <string name="workspace_settings">Settings</string>
+    <string name="workspace_sign_out">Sign out</string>
+    <string name="workspace_menu">Open navigation</string>
+    <string name="workspace_close_menu">Close navigation</string>
+    <string name="workspace_back">Back to overview</string>
+    <string name="workspace_navigation">Workspace navigation</string>
+    <string name="workspace_nav_heading">WORKSPACE</string>
+    <string name="workspace_account_heading">ACCOUNT</string>
+    <string name="workspace_account_default">Your account</string>
+    <string name="workspace_welcome">Welcome back, %1$s.</string>
+    <string name="workspace_welcome_default">Welcome back.</string>
+    <string name="workspace_intro">Plan your day. Make room for what matters.</string>
+    <string name="workspace_focus_eyebrow">TIME TO FOCUS</string>
+    <string name="workspace_focus_title">One thing at a time.</string>
+    <string name="workspace_focus_description">Create space for focused work or your next study session.</string>
+    <string name="workspace_open_focus">Open focus timer</string>
+    <string name="workspace_tools_heading">Your tools</string>
+    <string name="workspace_tools_description">Everything you need to move forward.</string>
+    <string name="workspace_tasks_description">Organize priorities and deadlines.</string>
+    <string name="workspace_calendar_description">Make space for your commitments.</string>
+    <string name="workspace_notes_description">Capture ideas and keep them organized.</string>
+    <string name="workspace_goals_description">Turn your plans into milestones.</string>
+    <string name="workspace_open_tasks">Open tasks</string>
+    <string name="workspace_open_calendar">Open calendar</string>
+    <string name="workspace_open_notes">Open notes</string>
+    <string name="workspace_open_goals">Open goals</string>
+    <string name="workspace_tool_accessibility">%1$s. %2$s</string>
+</resources>

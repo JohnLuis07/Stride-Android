@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_today">Today</string>
+    <string name="calendar_hint">Select a day to see its agenda.</string>
+    <string name="calendar_new_event">New event</string>
+    <string name="calendar_edit_event">Edit event</string>
+    <string name="calendar_save_event">Add to calendar</string>
+    <string name="calendar_update_event">Save changes</string>
+    <string name="calendar_cancel">Cancel</string>
+    <string name="calendar_edit">Edit</string>
+    <string name="calendar_delete">Delete</string>
+    <string name="calendar_delete_title">Delete event?</string>
+    <string name="calendar_delete_message">Remove ?%1$s? from your calendar? This cannot be undone.</string>
+    <string name="calendar_loading">Loading events?</string>
+    <string name="calendar_saving">Saving changes?</string>
+    <string name="calendar_load_failed">Could not load this month. Try again.</string>
+    <string name="calendar_save_failed">Could not save the event. Your changes are still here.</string>
+    <string name="calendar_delete_failed">Could not delete the event. Try again.</string>
+    <string name="calendar_retry">Retry</string>
+    <string name="calendar_empty">Nothing scheduled for this day.</string>
+    <string name="calendar_any_time">Any time</string>
+    <string name="calendar_time_range">%1$s ? %2$s</string>
+    <string name="calendar_time_from">From %1$s</string>
+    <string name="calendar_time_until">Until %1$s</string>
+    <string name="calendar_day_description">%1$s. %2$s</string>
+    <string name="calendar_today_description">%1$s, today. %2$s</string>
+    <string name="calendar_edit_description">Edit %1$s</string>
+    <string name="calendar_delete_description">Delete %1$s</string>
+    <string name="calendar_title_label">Event title</string>
+    <string name="calendar_title_hint">What are you planning?</string>
+    <string name="calendar_details_label">Details</string>
+    <string name="calendar_details_hint">Add context, an agenda, or a reminder.</string>
+    <string name="calendar_date_label">Date</string>
+    <string name="calendar_start_label">Start time</string>
+    <string name="calendar_end_label">End time</string>
+    <string name="calendar_optional_time">Not set</string>
+    <string name="calendar_clear_times">Clear times</string>
+    <string name="calendar_category_label">Category</string>
+    <string name="calendar_title_required">Enter an event title.</string>
+    <string name="calendar_time_invalid">Choose valid start and end times.</string>
+    <string name="calendar_end_before_start">End time must be after start time on the same day.</string>
+    <string name="calendar_category_focus">Focus</string>
+    <string name="calendar_category_meeting">Meeting</string>
+    <string name="calendar_category_personal">Personal</string>
+    <string name="calendar_category_deadline">Deadline</string>
+    <plurals name="calendar_event_count">
+        <item quantity="one">%d event</item>
+        <item quantity="other">%d events</item>
+    </plurals>
+    <string-array name="calendar_categories">
+        <item>@string/calendar_category_focus</item>
+        <item>@string/calendar_category_meeting</item>
+        <item>@string/calendar_category_personal</item>
+        <item>@string/calendar_category_deadline</item>
+    </string-array>
+</resources>

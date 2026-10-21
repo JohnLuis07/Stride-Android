@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/screen_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/workspace_surface"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/workspace_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_workspace_toolbar"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <ImageButton
+                android:id="@+id/back_button"
+                style="@style/StrideWorkspaceIconButton"
+                android:contentDescription="@string/workspace_back"
+                android:src="@drawable/ic_workspace_back"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/toolbar_logo_container"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/toolbar_logo"
+                    android:layout_width="140dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="start|center_vertical"
+                    android:contentDescription="@string/stride_logo"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/stride_logo" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textColor="@color/workspace_ink"
+                android:textSize="19sp"
+                android:visibility="gone"
+                tools:text="Tasks" />
+
+            <ImageButton
+                android:id="@+id/menu_button"
+                style="@style/StrideWorkspaceIconButton"
+                android:contentDescription="@string/workspace_menu"
+                android:src="@drawable/ic_workspace_menu" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/content_host"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            tools:layout="@layout/screen_dashboard" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/drawer_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/workspace_scrim"
+        android:visibility="gone"
+        tools:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/drawer_panel"
+            android:layout_width="304dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@drawable/bg_workspace_drawer"
+            android:clickable="true"
+            android:elevation="12dp"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <ImageView
+                        android:layout_width="140dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:contentDescription="@string/stride_logo"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/stride_logo" />
+                </FrameLayout>
+
+                <ImageButton
+                    android:id="@+id/drawer_close"
+                    style="@style/StrideWorkspaceIconButton"
+                    android:contentDescription="@string/workspace_close_menu"
+                    android:src="@drawable/ic_workspace_close" />
+            </LinearLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginTop="16dp"
+                android:overScrollMode="ifContentScrolls"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp">
+
+                    <TextView
+                        style="@style/StrideWorkspaceSection"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/workspace_nav_heading" />
+
+                    <Button
+                        android:id="@+id/nav_overview"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_overview"
+                        android:text="@string/workspace_overview" />
+
+                    <Button
+                        android:id="@+id/nav_tasks"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_tasks"
+                        android:text="@string/workspace_tasks" />
+
+                    <Button
+                        android:id="@+id/nav_calendar"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_calendar"
+                        android:text="@string/workspace_calendar" />
+
+                    <Button
+                        android:id="@+id/nav_notes"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_notes"
+                        android:text="@string/workspace_notes" />
+
+                    <Button
+                        android:id="@+id/nav_goals"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_goals"
+                        android:text="@string/workspace_goals" />
+
+                    <Button
+                        android:id="@+id/nav_focus"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_focus"
+                        android:text="@string/workspace_focus" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginEnd="14dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:background="@color/workspace_border" />
+
+                    <TextView
+                        style="@style/StrideWorkspaceSection"
+                        android:layout_marginStart="14dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/workspace_account_heading" />
+
+                    <Button
+                        android:id="@+id/nav_settings"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_settings"
+                        android:text="@string/workspace_settings" />
+                </LinearLayout>
+            </ScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_workspace_profile"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/drawer_avatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_workspace_avatar"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:textColor="@color/workspace_accent"
+                    android:textSize="14sp"
+                    tools:text="AR" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/drawer_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif-medium"
+                        android:maxLines="1"
+                        android:textColor="@color/workspace_ink"
+                        android:textSize="14sp"
+                        tools:text="Alex Rivera" />
+
+                    <TextView
+                        android:id="@+id/drawer_identity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/workspace_secondary"
+                        android:textSize="12sp"
+                        tools:text="alex@example.com" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/nav_logout"
+                style="@style/StrideWorkspaceNav"
+                android:layout_marginTop="8dp"
+                android:drawableStart="@drawable/ic_workspace_logout"
+                android:drawableTint="@color/workspace_logout"
+                android:text="@string/workspace_sign_out"
+                android:textColor="@color/workspace_logout" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="calendar_outside_month">#8B94A6</color>
+    <color name="calendar_error">#AC4551</color>
+    <color name="calendar_focus">#7352AE</color>
+    <color name="calendar_meeting">#356DB0</color>
+    <color name="calendar_personal">#28765D</color>
+    <color name="calendar_deadline">#AC4551</color>
+</resources>
