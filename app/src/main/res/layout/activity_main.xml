@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/screen_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/stride_surface">
+    android:background="@color/stride_surface"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +16,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:background="@color/stride_primary"
+            android:background="@drawable/bg_top_bar"
             android:gravity="center_vertical"
             android:paddingLeft="8dp"
             android:paddingRight="10dp">
@@ -29,24 +31,46 @@
                 android:textSize="29sp"
                 android:visibility="gone" />
 
+            <FrameLayout
+                android:id="@+id/toolbar_logo_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingRight="10dp">
+
+                <Button
+                    android:id="@+id/menu_button"
+                    android:layout_width="54dp"
+                    android:layout_height="52dp"
+                    android:background="@android:color/transparent"
+                    android:text="☰"
+                    android:textColor="@android:color/white"
+                    android:textSize="25sp" />
+
+
+            </FrameLayout>
+
             <TextView
                 android:id="@+id/toolbar_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="✦  Stride."
                 android:textColor="@android:color/white"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
-            <Button
-                android:id="@+id/menu_button"
-                android:layout_width="54dp"
-                android:layout_height="52dp"
-                android:background="@android:color/transparent"
-                android:text="☰"
-                android:textColor="@android:color/white"
-                android:textSize="25sp" />
+            <ImageView
+                android:id="@+id/toolbar_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/stride_logo"
+                android:elevation="2dp"
+                android:scaleType="fitStart"
+                android:src="@drawable/stride_logo2" />
+
+
 
         </LinearLayout>
 
@@ -54,7 +78,8 @@
             android:id="@+id/content_host"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            tools:layout="@layout/screen_dashboard" />
 
     </LinearLayout>
 
@@ -63,7 +88,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#66000000"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <LinearLayout
             android:id="@+id/drawer_panel"
@@ -73,13 +99,19 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="✦  Stride."
-                android:textColor="@color/stride_primary"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="220dp"
+                android:layout_height="74dp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/bg_logo_highlight"
+                android:contentDescription="@string/stride_logo"
+                android:elevation="2dp"
+                android:paddingLeft="12dp"
+                android:paddingTop="6dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="6dp"
+                android:scaleType="fitStart"
+                android:src="@drawable/stride_logo" />
 
             <TextView
                 android:id="@+id/drawer_identity"
@@ -101,6 +133,7 @@
                 android:id="@+id/nav_notes"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="✎   Notes" />
 
@@ -108,6 +141,7 @@
                 android:id="@+id/nav_calendar"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="□   Calendar" />
 
@@ -115,6 +149,7 @@
                 android:id="@+id/nav_tasks"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="✓   Tasks" />
 
@@ -122,6 +157,7 @@
                 android:id="@+id/nav_goals"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="◎   Goals" />
 
@@ -129,6 +165,7 @@
                 android:id="@+id/nav_focus"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="◷   Focus" />
 
@@ -136,6 +173,7 @@
                 android:id="@+id/nav_settings"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="⚙   Settings" />
 
@@ -150,7 +188,8 @@
                 android:layout_height="48dp"
                 android:background="@drawable/bg_secondary_button"
                 android:text="⇥   Log out"
-                android:textColor="#B8374B" />
+                android:backgroundTint="#FF6868"
+                android:textColor="#FFFFFF" />
 
         </LinearLayout>
 

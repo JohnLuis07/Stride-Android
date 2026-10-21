@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:id="@+id/content_container"
@@ -44,7 +46,8 @@
             android:background="@drawable/bg_card"
             android:orientation="vertical"
             android:padding="16dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -90,13 +93,15 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_secondary_button"
-                    android:text="Cancel" />
+                    android:text="Cancel"
+                    android:layout_marginEnd="4dp"/>
 
                 <Button
-                    android:id="@+id/save_task_button"
+                    android:id="@+id/saveTaskButton"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
+                    android:layout_marginStart="4dp"
                     android:background="@drawable/bg_primary_button"
                     android:text="Save task"
                     android:textColor="@android:color/white" />
@@ -119,7 +124,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="vertical" />
+            android:orientation="vertical"
+            tools:visibility="gone" />
 
     </LinearLayout>
 

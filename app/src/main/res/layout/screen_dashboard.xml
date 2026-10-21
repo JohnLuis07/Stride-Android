@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:fillViewport="true">
+  android:fillViewport="true"
+  tools:context=".MainActivity">
 
   <LinearLayout
     android:id="@+id/content_container"
@@ -38,169 +40,173 @@
       android:padding="17dp">
 
       <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="📝  Notes"
-        android:textColor="@color/stride_text"
-        android:textSize="19sp"
-        android:textStyle="bold" />
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="📝  Notes"
+          android:textColor="@color/stride_text"
+          android:textSize="19sp"
+          android:textStyle="bold" />
 
       <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Write and organize your thoughts."
-        android:textColor="@color/stride_muted"
-        android:textSize="15sp" />
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="6dp"
+          android:text="Write and organize your thoughts."
+          android:textColor="@color/stride_muted"
+          android:textSize="15sp" />
 
       <Button
-        android:id="@+id/open_notes"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/bg_primary_button"
-        android:text="Open"
-        android:textColor="@android:color/white" />
+          android:id="@+id/open_notes"
+          android:layout_width="match_parent"
+          android:layout_height="48dp"
+          android:layout_marginTop="12dp"
+          android:background="@drawable/bg_primary_button"
+          android:text="Open"
+          android:textColor="@android:color/white" />
     </LinearLayout>
 
     <LinearLayout
-      android:id="@+id/calendar_card"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="12dp"
-      android:background="@drawable/bg_card"
-      android:orientation="vertical"
-      android:padding="17dp">
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="📅  Calendar"
-        android:textColor="@color/stride_text"
-        android:textSize="19sp"
-        android:textStyle="bold" />
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Schedule focused work and personal events."
-        android:textColor="@color/stride_muted"
-        android:textSize="15sp" />
-
-      <Button
-        android:id="@+id/open_calendar"
+        android:id="@+id/calendar_card"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_primary_button"
-        android:text="Open"
-        android:textColor="@android:color/white" />
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:padding="17dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📅  Calendar"
+            android:textColor="@color/stride_text"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Schedule focused work and personal events."
+            android:textColor="@color/stride_muted"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/open_calendar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_primary_button"
+            android:text="Open"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 
     <LinearLayout
-      android:id="@+id/tasks_card"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="12dp"
-      android:background="@drawable/bg_card"
-      android:orientation="vertical"
-      android:padding="17dp">
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="✅  Tasks"
-        android:textColor="@color/stride_text"
-        android:textSize="19sp"
-        android:textStyle="bold" />
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Keep track of your to-dos."
-        android:textColor="@color/stride_muted"
-        android:textSize="15sp" />
-
-      <Button
-        android:id="@+id/open_tasks"
+        android:id="@+id/tasks_card"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_primary_button"
-        android:text="Open"
-        android:textColor="@android:color/white" />
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:padding="17dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="✅  Tasks"
+            android:textColor="@color/stride_text"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Keep track of your to-dos."
+            android:textColor="@color/stride_muted"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/open_tasks"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_primary_button"
+            android:text="Open"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 
     <LinearLayout
-      android:id="@+id/goals_card"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="12dp"
-      android:background="@drawable/bg_card"
-      android:orientation="vertical"
-      android:padding="17dp">
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="🎯  Goals"
-        android:textColor="@color/stride_text"
-        android:textSize="19sp"
-        android:textStyle="bold" />
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Set and achieve your milestones."
-        android:textColor="@color/stride_muted"
-        android:textSize="15sp" />
-
-      <Button
-        android:id="@+id/open_goals"
+        android:id="@+id/goals_card"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_primary_button"
-        android:text="Open"
-        android:textColor="@android:color/white" />
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:padding="17dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎯  Goals"
+            android:textColor="@color/stride_text"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Set and achieve your milestones."
+            android:textColor="@color/stride_muted"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/open_goals"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_primary_button"
+            android:text="Open"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 
     <LinearLayout
-      android:id="@+id/focus_card"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="12dp"
-      android:background="@drawable/bg_card"
-      android:orientation="vertical"
-      android:padding="17dp">
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="⏱️  Focus"
-        android:textColor="@color/stride_text"
-        android:textSize="19sp"
-        android:textStyle="bold" />
-
-      <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Master productivity with a timer."
-        android:textColor="@color/stride_muted"
-        android:textSize="15sp" />
-
-      <Button
-        android:id="@+id/open_focus"
+        android:id="@+id/focus_card"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:background="@drawable/bg_primary_button"
-        android:text="Open"
-        android:textColor="@android:color/white" />
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:padding="17dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⏱️  Focus"
+            android:textColor="@color/stride_text"
+            android:textSize="19sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Master productivity with a timer."
+            android:textColor="@color/stride_muted"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/open_focus"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_primary_button"
+            android:text="Open"
+            android:textColor="@android:color/white" />
     </LinearLayout>
+
   </LinearLayout>
+
 </ScrollView>
