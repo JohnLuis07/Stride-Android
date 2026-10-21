@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/workspace_surface"
+    android:fillViewport="true"
+    android:overScrollMode="ifContentScrolls"
+    android:scrollbars="none"
+    tools:context="com.stride.android.ui.DashboardScreen">
+
+    <LinearLayout
+        android:id="@+id/content_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/dashboard_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/workspace_secondary"
+            android:textSize="12sp"
+            tools:text="Monday, October 26" />
+
+        <TextView
+            android:id="@+id/page_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:accessibilityHeading="true"
+            android:fontFamily="sans-serif-medium"
+            android:includeFontPadding="false"
+            android:letterSpacing="-0.025"
+            android:text="@string/workspace_welcome_default"
+            android:textColor="@color/workspace_ink"
+            android:textSize="27sp"
+            tools:text="Welcome back, Alex." />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="3dp"
+            android:text="@string/workspace_intro"
+            android:textColor="@color/workspace_secondary"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/feature_carousel_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_workspace_focus"
+            android:clipToOutline="true"
+            android:orientation="vertical">
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/feature_carousel"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/workspace_carousel_height" />
+
+            <LinearLayout
+                android:id="@+id/carousel_controls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="22dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="4dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:importantForAccessibility="noHideDescendants">
+
+                    <View
+                        android:id="@+id/carousel_dot_one"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_carousel_dot"
+                        android:importantForAccessibility="no" />
+
+                    <View
+                        android:id="@+id/carousel_dot_two"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_carousel_dot"
+                        android:importantForAccessibility="no" />
+
+                    <View
+                        android:id="@+id/carousel_dot_three"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_carousel_dot"
+                        android:importantForAccessibility="no" />
+
+                    <View
+                        android:id="@+id/carousel_dot_four"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_carousel_dot"
+                        android:importantForAccessibility="no" />
+
+                    <View
+                        android:id="@+id/carousel_dot_five"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_carousel_dot"
+                        android:importantForAccessibility="no" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/carousel_position"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@color/workspace_focus_secondary"
+                    android:textSize="11sp"
+                    tools:text="1 / 5" />
+
+                <Button
+                    android:id="@+id/carousel_playback"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:background="@drawable/bg_carousel_playback"
+                    android:backgroundTint="@null"
+                    android:contentDescription="@string/carousel_pause_description"
+                    android:drawableStart="@drawable/ic_carousel_pause"
+                    android:drawablePadding="6dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:letterSpacing="0"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:stateListAnimator="@null"
+                    android:text="@string/carousel_pause"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/tools_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/workspace_tools_heading"
+                android:textColor="@color/workspace_ink"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/workspace_tools_description"
+                android:textColor="@color/workspace_secondary"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/tasks_card"
+                style="@style/StrideWorkspaceTool">
+
+                <ImageView
+                    style="@style/StrideWorkspaceToolIcon"
+                    android:background="@drawable/bg_workspace_tasks_icon"
+                    android:src="@drawable/ic_workspace_tasks"
+                    android:tint="@color/workspace_tasks" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolTitle"
+                        android:text="@string/workspace_tasks" />
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolDescription"
+                        android:text="@string/workspace_tasks_description" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/open_tasks"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_workspace_arrow"
+                    android:tint="@color/workspace_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/calendar_card"
+                style="@style/StrideWorkspaceTool">
+
+                <ImageView
+                    style="@style/StrideWorkspaceToolIcon"
+                    android:background="@drawable/bg_workspace_calendar_icon"
+                    android:src="@drawable/ic_workspace_calendar"
+                    android:tint="@color/workspace_calendar" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolTitle"
+                        android:text="@string/workspace_calendar" />
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolDescription"
+                        android:text="@string/workspace_calendar_description" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/open_calendar"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_workspace_arrow"
+                    android:tint="@color/workspace_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/notes_card"
+                style="@style/StrideWorkspaceTool">
+
+                <ImageView
+                    style="@style/StrideWorkspaceToolIcon"
+                    android:background="@drawable/bg_workspace_notes_icon"
+                    android:src="@drawable/ic_workspace_notes"
+                    android:tint="@color/workspace_notes" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolTitle"
+                        android:text="@string/workspace_notes" />
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolDescription"
+                        android:text="@string/workspace_notes_description" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/open_notes"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_workspace_arrow"
+                    android:tint="@color/workspace_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/goals_card"
+                style="@style/StrideWorkspaceTool">
+
+                <ImageView
+                    style="@style/StrideWorkspaceToolIcon"
+                    android:background="@drawable/bg_workspace_goals_icon"
+                    android:src="@drawable/ic_workspace_goals"
+                    android:tint="@color/workspace_goals" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolTitle"
+                        android:text="@string/workspace_goals" />
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolDescription"
+                        android:text="@string/workspace_goals_description" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/open_goals"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_workspace_arrow"
+                    android:tint="@color/workspace_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/focus_card"
+                style="@style/StrideWorkspaceTool">
+
+                <ImageView
+                    style="@style/StrideWorkspaceToolIcon"
+                    android:background="@drawable/bg_workspace_focus_tool_icon"
+                    android:src="@drawable/ic_workspace_focus"
+                    android:tint="@color/workspace_accent" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolTitle"
+                        android:text="@string/workspace_focus" />
+
+                    <TextView
+                        style="@style/StrideWorkspaceToolDescription"
+                        android:text="@string/workspace_focus_description" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/open_focus"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_workspace_arrow"
+                    android:tint="@color/workspace_icon" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

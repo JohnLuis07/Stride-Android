@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_calendar_month"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/previous_month"
+                style="@style/StrideWorkspaceIconButton"
+                android:contentDescription="@string/calendar_previous_month"
+                android:src="@drawable/ic_workspace_back" />
+
+            <TextView
+                android:id="@+id/month_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:accessibilityHeading="true"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:textColor="@color/workspace_ink"
+                android:textSize="18sp"
+                tools:text="October 2026" />
+
+            <ImageButton
+                android:id="@+id/next_month"
+                style="@style/StrideWorkspaceIconButton"
+                android:contentDescription="@string/calendar_next_month"
+                android:src="@drawable/ic_workspace_arrow" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="@string/calendar_hint"
+                android:textColor="@color/workspace_secondary"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/today_button"
+                style="@style/StrideCalendarTextButton"
+                android:text="@string/calendar_today" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/weekday_sunday"
+                style="@style/StrideCalendarWeekday"
+                tools:text="Sun" />
+
+            <TextView
+                android:id="@+id/weekday_monday"
+                style="@style/StrideCalendarWeekday"
+                tools:text="Mon" />
+
+            <TextView
+                android:id="@+id/weekday_tuesday"
+                style="@style/StrideCalendarWeekday"
+                tools:text="Tue" />
+
+            <TextView
+                android:id="@+id/weekday_wednesday"
+                style="@style/StrideCalendarWeekday"
+                tools:text="Wed" />
+
+            <TextView
+                android:id="@+id/weekday_thursday"
+                style="@style/StrideCalendarWeekday"
+                tools:text="Thu" />
+
+            <TextView
+                android:id="@+id/weekday_friday"
+                style="@style/StrideCalendarWeekday"
+                tools:text="Fri" />
+
+            <TextView
+                android:id="@+id/weekday_saturday"
+                style="@style/StrideCalendarWeekday"
+                tools:text="Sat" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/month_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:importantForAccessibility="yes"
+            tools:listitem="@layout/item_calendar_day" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/agenda_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/workspace_ink"
+                android:textSize="18sp"
+                tools:text="Wed, Oct 21" />
+
+            <TextView
+                android:id="@+id/event_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/workspace_secondary"
+                android:textSize="12sp"
+                tools:text="2 events" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/new_event_button"
+            style="@style/StrideCalendarPrimaryButton"
+            android:text="@string/calendar_new_event" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_indicator"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="12dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/error_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/calendar_load_failed"
+            android:textColor="@color/calendar_error"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/retry_button"
+            style="@style/StrideCalendarTextButton"
+            android:text="@string/calendar_retry" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/empty_agenda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:padding="20dp"
+        android:gravity="center"
+        android:text="@string/calendar_empty"
+        android:textColor="@color/workspace_secondary"
+        android:textSize="13sp"
+        android:visibility="gone" />
+</LinearLayout>

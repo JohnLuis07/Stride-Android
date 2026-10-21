@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="workspace_surface">#F5F6FA</color>
+    <color name="workspace_ink">#202438</color>
+    <color name="workspace_secondary">#657087</color>
+    <color name="workspace_icon">#626C81</color>
+    <color name="workspace_accent">#5744CC</color>
+    <color name="workspace_selected">#EEEBFC</color>
+    <color name="workspace_border">#E8EBF2</color>
+    <color name="workspace_scrim">#66151A2C</color>
+    <color name="workspace_focus_start">#34305F</color>
+    <color name="workspace_focus_end">#5948A6</color>
+    <color name="workspace_focus_secondary">#E0DAF5</color>
+    <color name="workspace_tasks">#28765D</color>
+    <color name="workspace_tasks_bg">#EAF5EF</color>
+    <color name="workspace_calendar">#356DB0</color>
+    <color name="workspace_calendar_bg">#EBF2FC</color>
+    <color name="workspace_notes">#896329</color>
+    <color name="workspace_notes_bg">#FBF4E6</color>
+    <color name="workspace_goals">#7753B0</color>
+    <color name="workspace_goals_bg">#F1ECF9</color>
+    <color name="workspace_logout">#AC4551</color>
+</resources>

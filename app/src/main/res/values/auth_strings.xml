@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_login_title">Welcome back.</string>
+    <string name="auth_login_subtitle">Your next step starts here.</string>
+    <string name="auth_signup_title">Start your stride.</string>
+    <string name="auth_signup_subtitle">A little focus. A little progress. Every day.</string>
+    <string name="auth_tagline">Make space for what matters.</string>
+    <string name="auth_name_label">Full name</string>
+    <string name="auth_name_hint">Your name</string>
+    <string name="auth_email_label">Email address</string>
+    <string name="auth_email_hint">you@example.com</string>
+    <string name="auth_password_label">Password</string>
+    <string name="auth_password_hint">Enter your password</string>
+    <string name="auth_new_password_hint">Create a password</string>
+    <string name="auth_confirm_label">Confirm password</string>
+    <string name="auth_confirm_hint">Re-enter your password</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_create_account">Create account</string>
+    <string name="auth_new_here">New to Stride?</string>
+    <string name="auth_already_member">Already a member?</string>
+    <string name="auth_footer">Small steps. Meaningful progress.</string>
+</resources>

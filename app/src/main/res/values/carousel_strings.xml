@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="carousel_tasks_label">CLEAR YOUR NEXT STEP</string>
+    <string name="carousel_tasks_title">Turn plans into progress.</string>
+    <string name="carousel_tasks_description">Keep your next steps organized and your priorities clear.</string>
+    <string name="carousel_calendar_label">MAKE ROOM FOR YOUR DAY</string>
+    <string name="carousel_calendar_title">Give your day direction.</string>
+    <string name="carousel_calendar_description">Plan time for deadlines, classes, and everything in between.</string>
+    <string name="carousel_notes_label">CAPTURE WHAT MATTERS</string>
+    <string name="carousel_notes_title">Keep your ideas close.</string>
+    <string name="carousel_notes_description">Save a quick thought, a meeting note, or your next big idea.</string>
+    <string name="carousel_goals_label">PROGRESS WITH PURPOSE</string>
+    <string name="carousel_goals_title">Keep the bigger picture.</string>
+    <string name="carousel_goals_description">Set a milestone and take the next step toward it.</string>
+    <string name="carousel_pause">Pause</string>
+    <string name="carousel_resume">Resume</string>
+    <string name="carousel_pause_description">Pause automatic feature rotation</string>
+    <string name="carousel_resume_description">Resume automatic feature rotation</string>
+    <string name="carousel_position">%1$d / %2$d</string>
+    <string name="carousel_position_description">%1$s, slide %2$d of %3$d</string>
+</resources>

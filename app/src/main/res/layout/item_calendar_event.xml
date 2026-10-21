@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/bg_workspace_card"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/event_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_calendar_category"
+        android:fontFamily="sans-serif-medium"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textColor="@color/workspace_accent"
+        android:textSize="11sp"
+        tools:text="Meeting" />
+
+    <TextView
+        android:id="@+id/event_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/workspace_ink"
+        android:textSize="17sp"
+        tools:text="Project planning" />
+
+    <TextView
+        android:id="@+id/event_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/workspace_accent"
+        android:textSize="13sp"
+        tools:text="9:00 AM ? 10:00 AM" />
+
+    <TextView
+        android:id="@+id/event_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textColor="@color/workspace_secondary"
+        android:textSize="13sp"
+        tools:text="Review priorities and decide the next steps." />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="end|center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/edit_button"
+            style="@style/StrideCalendarTextButton"
+            android:drawableStart="@drawable/ic_calendar_edit"
+            android:drawablePadding="6dp"
+            android:drawableTint="@color/workspace_accent"
+            android:text="@string/calendar_edit" />
+
+        <ImageButton
+            android:id="@+id/delete_button"
+            style="@style/StrideWorkspaceIconButton"
+            android:src="@drawable/ic_calendar_delete"
+            android:tint="@color/calendar_error"
+            tools:contentDescription="Delete project planning" />
+    </LinearLayout>
+</LinearLayout>

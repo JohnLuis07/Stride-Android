@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_auth_screen"
+    android:fillViewport="true"
+    android:overScrollMode="ifContentScrolls"
+    android:scrollbars="none"
+    tools:context="com.stride.android.ui.SignupScreen"
+    tools:theme="@style/Theme.Stride">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp"
+        android:focusableInTouchMode="true">
+
+        <ImageView
+            android:layout_width="172dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/bg_auth_header"
+            android:clipToOutline="true"
+            android:contentDescription="@string/stride_logo"
+            android:scaleType="centerCrop"
+            android:src="@drawable/stride_logo" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="22dp"
+            android:gravity="center"
+            android:text="@string/auth_tagline"
+            android:textColor="@color/auth_muted"
+            android:textSize="13sp" />
+
+        <LinearLayout style="@style/StrideAuthCard">
+
+            <TextView
+                style="@style/StrideAuthTitle"
+                android:accessibilityHeading="true"
+                android:text="@string/auth_signup_title" />
+
+            <TextView
+                style="@style/StrideAuthSubtitle"
+                android:text="@string/auth_signup_subtitle" />
+
+            <TextView
+                android:id="@+id/name_label"
+                style="@style/StrideAuthLabel"
+                android:layout_marginTop="20dp"
+                android:labelFor="@id/name_input"
+                android:text="@string/auth_name_label" />
+
+            <EditText
+                android:id="@+id/name_input"
+                style="@style/StrideAuthInput"
+                android:autofillHints="name"
+                android:hint="@string/auth_name_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textPersonName|textCapWords"
+                android:nextFocusForward="@id/email_input"
+                android:nextFocusDown="@id/email_input"
+                tools:text="Alex Rivera" />
+
+            <TextView
+                android:id="@+id/email_label"
+                style="@style/StrideAuthLabel"
+                android:labelFor="@id/email_input"
+                android:text="@string/auth_email_label" />
+
+            <EditText
+                android:id="@+id/email_input"
+                style="@style/StrideAuthInput"
+                android:autofillHints="emailAddress"
+                android:hint="@string/auth_email_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textEmailAddress"
+                android:nextFocusForward="@id/password_input"
+                android:nextFocusDown="@id/password_input"
+                tools:text="you@example.com" />
+
+            <TextView
+                android:id="@+id/password_label"
+                style="@style/StrideAuthLabel"
+                android:labelFor="@id/password_input"
+                android:text="@string/auth_password_label" />
+
+            <EditText
+                android:id="@+id/password_input"
+                style="@style/StrideAuthInput"
+                android:autofillHints="newPassword"
+                android:hint="@string/auth_new_password_hint"
+                android:imeOptions="actionNext"
+                android:inputType="textPassword"
+                android:nextFocusForward="@id/confirm_password_input"
+                android:nextFocusDown="@id/confirm_password_input"
+                tools:text="password123" />
+
+            <TextView
+                android:id="@+id/confirm_password_label"
+                style="@style/StrideAuthLabel"
+                android:labelFor="@id/confirm_password_input"
+                android:text="@string/auth_confirm_label" />
+
+            <EditText
+                android:id="@+id/confirm_password_input"
+                style="@style/StrideAuthInput"
+                android:autofillHints="newPassword"
+                android:hint="@string/auth_confirm_hint"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword"
+                tools:text="password123" />
+
+            <Button
+                android:id="@+id/create_account_button"
+                style="@style/StrideAuthPrimaryButton"
+                android:text="@string/auth_create_account" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auth_already_member"
+                    android:textColor="@color/auth_muted"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/back_to_sign_in_button"
+                    style="@style/StrideAuthSecondaryButton"
+                    android:layout_marginStart="2dp"
+                    android:text="@string/auth_sign_in" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            android:text="@string/auth_footer"
+            android:textColor="@color/auth_muted"
+            android:textSize="12sp" />
+    </LinearLayout>
+</ScrollView>
