@@ -1,99 +1,2110 @@
 package com.stride.android;
 
-import android.app.*;
-import android.content.*;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
-import android.os.*;
+import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.text.InputType;
-import android.view.*;
-import android.widget.*;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.stride.android.databinding.ActivityMainBinding;
-import org.json.*;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Locale;
+import java.util.UUID;
 
-/** Native client for every workspace area provided by the original Stride web app. */
+/**
+ * Native client for every workspace area provided by the original Stride web app.
+ */
 public class MainActivity extends Activity {
-    private static final int PRIMARY = Color.rgb(91, 92, 226), INK = Color.rgb(29,27,32), MUTED = Color.rgb(98,99,112);
-    private LinearLayout content; private SharedPreferences prefs; private SupabaseApi api;
-    private FrameLayout screenRoot, drawer; private ActivityMainBinding mainBinding; private String activePage = "Overview";
-    private JSONObject user; private CountDownTimer timer; private long timeLeft; private FocusScreen focusScreen;
-    private final String[] pages = {"Overview", "Notes", "Calendar", "Tasks", "Goals", "Focus", "Settings", "Logout"};
 
-    @Override public void onCreate(Bundle state) { super.onCreate(state); prefs=getSharedPreferences("stride",MODE_PRIVATE); api=new SupabaseApi(); timeLeft=prefs.getLong("focus_time",25*60_000L); restoreSession(); }
-    @Override protected void onPause() { super.onPause(); if(focusScreen!=null)focusScreen.save(); else prefs.edit().putLong("focus_time",timeLeft).apply(); }
-    @Override public void onBackPressed() { if(drawer!=null&&drawer.getVisibility()==View.VISIBLE){closeDrawer();return;} if(user!=null&&!activePage.equals("Overview")){showDashboard();return;} super.onBackPressed(); }
+    private static final int PRIMARY = Color.rgb(91, 92, 226);
+    private static final int INK = Color.rgb(29, 27, 32);
+    private static final int MUTED = Color.rgb(98, 99, 112);
+
+    private LinearLayout content;
+    private SharedPreferences prefs;
+    private SupabaseApi api;
+
+    private FrameLayout screenRoot;
+    private FrameLayout drawer;
+
+    private ActivityMainBinding mainBinding;
+
+    private String activePage = "Overview";
+
+    private JSONObject user;
+
+    private CountDownTimer timer;
+    private long timeLeft;
+
+    private FocusScreen focusScreen;
+
+    private final String[] pages = {
+            "Overview",
+            "Notes",
+            "Calendar",
+            "Tasks",
+            "Goals",
+            "Focus",
+            "Settings",
+            "Logout"
+    };
+
+    @Override
+    public void onCreate(Bundle state) {
+        super.onCreate(state);
+
+        prefs = getSharedPreferences(
+                "stride",
+                MODE_PRIVATE
+        );
+
+        api = new SupabaseApi();
+
+        timeLeft = prefs.getLong(
+                "focus_time",
+                25 * 60_000L
+        );
+
+        restoreSession();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (focusScreen != null) {
+            focusScreen.save();
+        } else {
+            prefs.edit()
+                    .putLong("focus_time", timeLeft)
+                    .apply();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawer != null
+                && drawer.getVisibility() == View.VISIBLE) {
+
+            closeDrawer();
+            return;
+        }
+
+        if (user != null
+                && !activePage.equals("Overview")) {
+
+            showDashboard();
+            return;
+        }
+
+        super.onBackPressed();
+    }
 
     private void restoreSession() {
-        String email=prefs.getString("userEmail",""); if(email.isEmpty()) { showLogin(); return; }
-        api.get("users", SupabaseApi.and("select=*",SupabaseApi.eq("email",email)), (rows,error)-> { if(error!=null||rows.length()!=1) { signOut(); } else { user=rows.optJSONObject(0); showDashboard(); } });
+        String email = prefs.getString(
+                "userEmail",
+                ""
+        );
+
+        if (email.isEmpty()) {
+            showLogin();
+            return;
+        }
+
+        api.get(
+                "users",
+                SupabaseApi.and(
+                        "select=*",
+                        SupabaseApi.eq("email", email)
+                ),
+                (rows, error) -> {
+                    if (error != null || rows.length() != 1) {
+                        signOut();
+                    } else {
+                        user = rows.optJSONObject(0);
+                        showDashboard();
+                    }
+                }
+        );
     }
-    private void shell(String title, FeatureScreen screen) {
-        mainBinding=ActivityMainBinding.inflate(getLayoutInflater()); setContentView(mainBinding.getRoot()); screenRoot=mainBinding.screenRoot; drawer=mainBinding.drawerOverlay;
-        boolean canGoBack=!activePage.equals("Overview"); mainBinding.toolbarTitle.setText(canGoBack?title:"✦  Stride."); mainBinding.backButton.setVisibility(canGoBack?View.VISIBLE:View.GONE); mainBinding.backButton.setOnClickListener(v->showDashboard()); mainBinding.menuButton.setOnClickListener(v->openDrawer());
-        mainBinding.contentHost.addView(screen.root()); content=screen.content(); buildDrawer();
+
+    private void shell(
+            String title,
+            FeatureScreen screen
+    ) {
+        mainBinding = ActivityMainBinding.inflate(
+                getLayoutInflater()
+        );
+
+        setContentView(mainBinding.getRoot());
+        applySystemBarInsets(mainBinding.getRoot());
+
+        screenRoot = mainBinding.screenRoot;
+        drawer = mainBinding.drawerOverlay;
+
+        boolean canGoBack =
+                !activePage.equals("Overview");
+
+        if (canGoBack) {
+            mainBinding.toolbarLogoContainer.setVisibility(
+                    View.GONE
+            );
+            mainBinding.toolbarTitle.setVisibility(
+                    View.VISIBLE
+            );
+            mainBinding.toolbarTitle.setText(title);
+        } else {
+            mainBinding.toolbarTitle.setVisibility(
+                    View.GONE
+            );
+            mainBinding.toolbarLogoContainer.setVisibility(
+                    View.VISIBLE
+            );
+        }
+
+        mainBinding.backButton.setVisibility(
+                canGoBack
+                        ? View.VISIBLE
+                        : View.GONE
+        );
+
+        mainBinding.backButton.setOnClickListener(
+                v -> showDashboard()
+        );
+
+        mainBinding.menuButton.setOnClickListener(
+                v -> openDrawer()
+        );
+
+        mainBinding.contentHost.addView(
+                screen.root()
+        );
+
+        content = screen.content();
+
+        buildDrawer();
     }
-    private void buildDrawer(){
-        mainBinding.drawerIdentity.setText(user==null?"Your focused workspace":user.optString("full_name","Your workspace")+"\n"+user.optString("email"));
-        drawer.setOnClickListener(v->closeDrawer()); mainBinding.drawerPanel.setOnClickListener(v->{});
-        mainBinding.navOverview.setOnClickListener(v->{closeDrawer();showDashboard();}); mainBinding.navNotes.setOnClickListener(v->{closeDrawer();showNotes();}); mainBinding.navCalendar.setOnClickListener(v->{closeDrawer();showCalendar();}); mainBinding.navTasks.setOnClickListener(v->{closeDrawer();showTasks();}); mainBinding.navGoals.setOnClickListener(v->{closeDrawer();showGoals();}); mainBinding.navFocus.setOnClickListener(v->{closeDrawer();showFocus();}); mainBinding.navSettings.setOnClickListener(v->{closeDrawer();showProfile();}); mainBinding.navLogout.setOnClickListener(v->{closeDrawer();signOut();});
+
+    private void buildDrawer() {
+        mainBinding.drawerIdentity.setText(
+                user == null
+                        ? "Your focused workspace"
+                        : user.optString(
+                        "full_name",
+                        "Your workspace"
+                )
+                        + "\n"
+                        + user.optString("email")
+        );
+
+        drawer.setOnClickListener(
+                v -> closeDrawer()
+        );
+
+        mainBinding.drawerPanel.setOnClickListener(
+                v -> {
+                }
+        );
+
+        mainBinding.navOverview.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    showDashboard();
+                }
+        );
+
+        mainBinding.navNotes.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    showNotes();
+                }
+        );
+
+        mainBinding.navCalendar.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    showCalendar();
+                }
+        );
+
+        mainBinding.navTasks.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    showTasks();
+                }
+        );
+
+        mainBinding.navGoals.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    showGoals();
+                }
+        );
+
+        mainBinding.navFocus.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    showFocus();
+                }
+        );
+
+        mainBinding.navSettings.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    showProfile();
+                }
+        );
+
+        mainBinding.navLogout.setOnClickListener(
+                v -> {
+                    closeDrawer();
+                    signOut();
+                }
+        );
     }
-    private void openDrawer(){if(drawer!=null)drawer.setVisibility(View.VISIBLE);}
-    private void closeDrawer(){if(drawer!=null)drawer.setVisibility(View.GONE);}
-    private void navigateTo(int i){ switch(i) { case 0:showDashboard();break;case 1:showNotes();break;case 2:showCalendar();break;case 3:showTasks();break;case 4:showGoals();break;case 5:showFocus();break;case 6:showProfile();break; }}
-    private boolean loggedIn() { if(user==null){showLogin();return false;} return true; }
+
+    private void openDrawer() {
+        if (drawer != null) {
+            drawer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void closeDrawer() {
+        if (drawer != null) {
+            drawer.setVisibility(View.GONE);
+        }
+    }
+
+    private void navigateTo(int i) {
+        switch (i) {
+            case 0:
+                showDashboard();
+                break;
+
+            case 1:
+                showNotes();
+                break;
+
+            case 2:
+                showCalendar();
+                break;
+
+            case 3:
+                showTasks();
+                break;
+
+            case 4:
+                showGoals();
+                break;
+
+            case 5:
+                showFocus();
+                break;
+
+            case 6:
+                showProfile();
+                break;
+        }
+    }
+
+    private boolean loggedIn() {
+        if (user == null) {
+            showLogin();
+            return false;
+        }
+
+        return true;
+    }
 
     // Authentication mirrors the web app's manual users-table flow.
     private void showLogin() {
-        LoginScreen screen=new LoginScreen(getLayoutInflater()); setContentView(screen.binding.getRoot()); EditText email=screen.email(); EditText password=screen.password(); Button signIn=screen.signIn(); Button create=screen.createAccount();
-        signIn.setOnClickListener(v->{ String e=email.getText().toString().trim(), p=password.getText().toString(); if(e.isEmpty()||p.isEmpty()){toast("Enter your email and password");return;} signIn.setEnabled(false); api.get("users",SupabaseApi.and("select=*",SupabaseApi.eq("email",e),SupabaseApi.eq("password",p)),(rows,error)->{signIn.setEnabled(true);if(error!=null||rows.length()!=1){toast("Invalid email or password");}else{user=rows.optJSONObject(0);prefs.edit().putString("userEmail",e).apply();showDashboard();}}); });
-        create.setOnClickListener(v->showSignup());
+        LoginScreen screen =
+                new LoginScreen(getLayoutInflater());
+
+        setContentView(screen.binding.getRoot());
+        applySystemBarInsets(screen.binding.getRoot());
+
+        EditText email = screen.email();
+        EditText password = screen.password();
+
+        Button signIn = screen.signIn();
+        Button create = screen.createAccount();
+
+        signIn.setOnClickListener(v -> {
+            String e = email.getText()
+                    .toString()
+                    .trim();
+
+            String p = password.getText()
+                    .toString();
+
+            if (e.isEmpty() || p.isEmpty()) {
+                toast("Enter your email and password");
+                return;
+            }
+
+            signIn.setEnabled(false);
+
+            api.get(
+                    "users",
+                    SupabaseApi.and(
+                            "select=*",
+                            SupabaseApi.eq("email", e),
+                            SupabaseApi.eq("password", p)
+                    ),
+                    (rows, error) -> {
+                        signIn.setEnabled(true);
+
+                        if (error != null
+                                || rows.length() != 1) {
+
+                            toast("Invalid email or password");
+
+                        } else {
+                            user = rows.optJSONObject(0);
+
+                            prefs.edit()
+                                    .putString("userEmail", e)
+                                    .apply();
+
+                            showDashboard();
+                        }
+                    }
+            );
+        });
+
+        create.setOnClickListener(
+                v -> showSignup()
+        );
     }
+
     private void showSignup() {
-        SignupScreen screen=new SignupScreen(getLayoutInflater()); setContentView(screen.binding.getRoot()); EditText name=screen.name(), email=screen.email(), pass=screen.password(), confirm=screen.confirmPassword(); Button create=screen.createAccount(), back=screen.backToSignIn();
-        create.setOnClickListener(v->{String n=name.getText().toString().trim(),e=email.getText().toString().trim(),p=pass.getText().toString();if(n.isEmpty()||e.isEmpty()||p.isEmpty()){toast("Complete every field");return;}if(!p.equals(confirm.getText().toString())){toast("Passwords don't match");return;} JSONObject body=new JSONObject();try{body.put("id",UUID.randomUUID().toString());body.put("full_name",n);body.put("email",e);body.put("password",p);}catch(Exception ignored){} create.setEnabled(false);api.insert("users",body,(rows,error)->{create.setEnabled(true);if(error!=null)toast(error.contains("23505")?"Email already exists": "Could not create account");else{toast("Account created. Please sign in.");showLogin();}});}); back.setOnClickListener(v->showLogin());
+        SignupScreen screen =
+                new SignupScreen(getLayoutInflater());
+
+        setContentView(screen.binding.getRoot());
+        applySystemBarInsets(screen.binding.getRoot());
+
+        EditText name = screen.name();
+        EditText email = screen.email();
+        EditText pass = screen.password();
+        EditText confirm = screen.confirmPassword();
+
+        Button create = screen.createAccount();
+        Button back = screen.backToSignIn();
+
+        create.setOnClickListener(v -> {
+            String n = name.getText()
+                    .toString()
+                    .trim();
+
+            String e = email.getText()
+                    .toString()
+                    .trim();
+
+            String p = pass.getText()
+                    .toString();
+
+            if (n.isEmpty()
+                    || e.isEmpty()
+                    || p.isEmpty()) {
+
+                toast("Complete every field");
+                return;
+            }
+
+            if (!p.equals(
+                    confirm.getText().toString()
+            )) {
+                toast("Passwords don't match");
+                return;
+            }
+
+            JSONObject body = new JSONObject();
+
+            try {
+                body.put(
+                        "id",
+                        UUID.randomUUID().toString()
+                );
+
+                body.put(
+                        "full_name",
+                        n
+                );
+
+                body.put(
+                        "email",
+                        e
+                );
+
+                body.put(
+                        "password",
+                        p
+                );
+
+            } catch (Exception ignored) {
+            }
+
+            create.setEnabled(false);
+
+            api.insert(
+                    "users",
+                    body,
+                    (rows, error) -> {
+                        create.setEnabled(true);
+
+                        if (error != null) {
+                            toast(
+                                    error.contains("23505")
+                                            ? "Email already exists"
+                                            : "Could not create account"
+                            );
+                        } else {
+                            toast(
+                                    "Account created. Please sign in."
+                            );
+
+                            showLogin();
+                        }
+                    }
+            );
+        });
+
+        back.setOnClickListener(
+                v -> showLogin()
+        );
     }
-    private void signOut() { if(timer!=null)timer.cancel(); if(focusScreen!=null)focusScreen.stop(); timer=null; user=null; prefs.edit().remove("userEmail").apply(); showLogin(); }
 
-    private void showDashboard() { if(!loggedIn())return; activePage="Overview"; DashboardScreen screen=new DashboardScreen(this,user); shell("Stride.",screen); screen.bind(this::showNotes,this::showCalendar,this::showTasks,this::showGoals,this::showFocus); }
-    private void showTasks() { if(!loggedIn())return; activePage="Tasks"; TasksScreen screen=new TasksScreen(this,api,user); shell("Tasks",screen); screen.bind(); }
-    private void loadTasks(LinearLayout list,String filter){ list.removeAllViews(); api.get("tasks",SupabaseApi.and("select=*",SupabaseApi.eq("user_id",user.optString("id")),"order=created_at.desc"),(rows,error)->{if(error!=null){list.addView(text("Could not load tasks.",16,MUTED));return;}if(rows.length()==0)list.addView(text("No tasks yet.",16,MUTED));for(int i=0;i<rows.length();i++){JSONObject task=rows.optJSONObject(i); if(!filter.equals("all")&&!filter.equals(task.optString("status")))continue; entityRow(list,task,task.optString("title"),task.optString("priority","Medium")+" · "+task.optString("status","todo")+(task.optString("due_date").isEmpty()?"":" · "+task.optString("due_date")),v->taskActions(task,list));}}); }
-    private void taskDialog(JSONObject existing,LinearLayout list){
-        LinearLayout f=dialogForm(); EditText title=field("What needs to be done?",1),details=field("Details (optional)",1),due=field("Due date (YYYY-MM-DD)",1),priority=field("Priority: Low, Medium, or High",1); if(existing!=null){title.setText(existing.optString("title"));details.setText(existing.optString("details"));due.setText(existing.optString("due_date"));priority.setText(existing.optString("priority","Medium"));} else priority.setText("Medium"); f.addView(title);f.addView(details);f.addView(due);f.addView(priority);
-        AlertDialog d=new AlertDialog.Builder(this).setTitle(existing==null?"New task":"Edit task").setView(f).setNegativeButton("Cancel",null).setPositiveButton(existing==null?"Create":"Update",null).create(); d.setOnShowListener(x->d.getButton(-1).setOnClickListener(v->{if(title.getText().toString().trim().isEmpty())return;JSONObject b=obj("user_id",user.optString("id"),"title",title.getText().toString().trim(),"details",emptyNull(details),"due_date",emptyNull(due),"priority",priority.getText().toString().trim(),"updated_at",now()); SupabaseApi.Callback done=(r,e)->{if(e!=null)toast("Could not save task");else{d.dismiss();loadTasks(list,"all");}};if(existing==null)api.insert("tasks",obj("user_id",user.optString("id"),"title",title.getText().toString().trim(),"details",emptyNull(details),"due_date",emptyNull(due),"priority",priority.getText().toString().trim(),"status","todo","updated_at",now()),done);else api.update("tasks",SupabaseApi.eq("id",existing.optString("id")),b,done);}));d.show();
+    private void applySystemBarInsets(View root) {
+        int left = root.getPaddingLeft();
+        int top = root.getPaddingTop();
+        int right = root.getPaddingRight();
+        int bottom = root.getPaddingBottom();
+
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            view.setPadding(
+                    left,
+                    top + insets.getSystemWindowInsetTop(),
+                    right,
+                    bottom + insets.getSystemWindowInsetBottom()
+            );
+            return insets;
+        });
+        root.requestApplyInsets();
     }
-    private void taskActions(JSONObject task,LinearLayout list){ String[] choices={"Mark To Do","Mark Active","Mark Done","Edit","Delete"}; new AlertDialog.Builder(this).setTitle(task.optString("title")).setItems(choices,(d,w)->{if(w<3){api.update("tasks",SupabaseApi.eq("id",task.optString("id")),obj("status",new String[]{"todo","doing","done"}[w],"updated_at",now()),(r,e)->loadTasks(list,"all"));}else if(w==3)taskDialog(task,list);else confirmDelete("task",task,"tasks",list,l->loadTasks(l,"all"));}).show(); }
 
-    private void showNotes(){if(!loggedIn())return;activePage="Notes";NotesScreen screen=new NotesScreen(this,api,user);shell("Notes",screen);screen.bind();}
-    private void loadNotes(LinearLayout list){list.removeAllViews();api.get("notes",SupabaseApi.and("select=*",SupabaseApi.eq("user_id",user.optString("id")),"order=updated_at.desc"),(rows,e)->{if(e!=null){list.addView(text("Could not load notes.",16,MUTED));return;}if(rows.length()==0)list.addView(text("No notes yet.",16,MUTED));for(int i=0;i<rows.length();i++){JSONObject note=rows.optJSONObject(i);entityRow(list,note,note.optString("title","Untitled Note"),strip(note.optString("content")),v->noteEditor(note,list));}});}
-    private void noteEditor(JSONObject existing,LinearLayout list){LinearLayout f=dialogForm();EditText title=field("Title",1),body=field("Write something worth remembering…",1);body.setMinLines(7);body.setGravity(Gravity.TOP);if(existing!=null){title.setText(existing.optString("title"));body.setText(existing.optString("content"));}f.addView(title);f.addView(body);AlertDialog d=new AlertDialog.Builder(this).setTitle(existing==null?"New note":"Edit note").setView(f).setNegativeButton("Cancel",null).setNeutralButton(existing==null?"":"Delete",null).setPositiveButton("Save",null).create();d.setOnShowListener(x->{d.getButton(-1).setOnClickListener(v->{JSONObject b=obj("user_id",user.optString("id"),"title",title.getText().toString().trim().isEmpty()?"Untitled Note":title.getText().toString().trim(),"content",body.getText().toString(),"updated_at",now());SupabaseApi.Callback cb=(r,e)->{if(e!=null)toast("Could not save note");else{d.dismiss();loadNotes(list);}};if(existing==null)api.insert("notes",b,cb);else api.update("notes",SupabaseApi.eq("id",existing.optString("id")),b,cb);});if(existing!=null)d.getButton(-3).setOnClickListener(v->confirmDelete("note",existing,"notes",list,this::loadNotes));});d.show();}
+    private void signOut() {
+        if (timer != null) {
+            timer.cancel();
+        }
 
-    private void showGoals(){if(!loggedIn())return;activePage="Goals";GoalsScreen screen=new GoalsScreen(this,api,user);shell("Goals",screen);screen.bind();}
-    private void loadGoals(LinearLayout list){list.removeAllViews();api.get("goals",SupabaseApi.and("select=*",SupabaseApi.eq("user_id",user.optString("id")),"order=created_at.desc"),(rows,e)->{if(e!=null){list.addView(text("Could not load goals.",16,MUTED));return;}if(rows.length()==0)list.addView(text("No goals yet.",16,MUTED));for(int i=0;i<rows.length();i++){JSONObject g=rows.optJSONObject(i);double t=g.optDouble("target_value",100),c=g.optDouble("current_value",0);entityRow(list,g,g.optString("title"),String.format(Locale.US,"%.0f / %.0f %s",c,t,g.optString("unit","%")),v->goalActions(g,list));}});}
-    private void goalDialog(JSONObject existing,LinearLayout list){LinearLayout f=dialogForm();EditText title=field("Goal title",1),notes=field("Notes",1),target=field("Target value",2),current=field("Current value",2),unit=field("Unit (%, pages, sessions)",1),date=field("Target date (YYYY-MM-DD)",1);if(existing!=null){title.setText(existing.optString("title"));notes.setText(existing.optString("notes"));target.setText(existing.optString("target_value","100"));current.setText(existing.optString("current_value","0"));unit.setText(existing.optString("unit","%"));date.setText(existing.optString("target_date"));}else{target.setText("100");current.setText("0");unit.setText("%");}for(EditText x:new EditText[]{title,notes,target,current,unit,date})f.addView(x);AlertDialog d=new AlertDialog.Builder(this).setTitle(existing==null?"New goal":"Edit goal").setView(f).setNegativeButton("Cancel",null).setPositiveButton("Save",null).create();d.setOnShowListener(x->d.getButton(-1).setOnClickListener(v->{if(title.getText().toString().trim().isEmpty())return;JSONObject b=obj("user_id",user.optString("id"),"title",title.getText().toString().trim(),"notes",emptyNull(notes),"target_value",number(target,100),"current_value",number(current,0),"unit",unit.getText().toString().trim(),"target_date",emptyNull(date),"updated_at",now());SupabaseApi.Callback cb=(r,e)->{if(e!=null)toast("Could not save goal");else{d.dismiss();loadGoals(list);}};if(existing==null)api.insert("goals",b,cb);else api.update("goals",SupabaseApi.eq("id",existing.optString("id")),b,cb);}));d.show();}
-    private void goalActions(JSONObject goal,LinearLayout list){new AlertDialog.Builder(this).setTitle(goal.optString("title")).setItems(new String[]{"Update progress","Edit","Delete"},(d,w)->{if(w==0){EditText value=field("Current value",2);value.setText(goal.optString("current_value"));new AlertDialog.Builder(this).setTitle("Update progress").setView(value).setPositiveButton("Save",(a,b)->api.update("goals",SupabaseApi.eq("id",goal.optString("id")),obj("current_value",number(value,0),"updated_at",now()),(r,e)->loadGoals(list))).setNegativeButton("Cancel",null).show();}else if(w==1)goalDialog(goal,list);else confirmDelete("goal",goal,"goals",list,this::loadGoals);}).show();}
+        if (focusScreen != null) {
+            focusScreen.stop();
+        }
 
-    private void showCalendar(){if(!loggedIn())return;activePage="Calendar";CalendarScreen screen=new CalendarScreen(this,api,user);shell("Smart Calendar",screen);screen.bind();}
-    private void loadEvents(LinearLayout list,String date){list.removeAllViews();api.get("calendar_events",SupabaseApi.and("select=*",SupabaseApi.eq("user_id",user.optString("id")),SupabaseApi.eq("event_date",date),"order=start_time.asc"),(rows,e)->{if(e!=null){list.addView(text("Could not load events.",16,MUTED));return;}if(rows.length()==0)list.addView(text("Free day!",16,MUTED));for(int i=0;i<rows.length();i++){JSONObject event=rows.optJSONObject(i);entityRow(list,event,event.optString("title"),event.optString("category","Focus")+" · "+event.optString("start_time","Any time"),v->eventActions(event,list,date));}});}
-    private void eventDialog(JSONObject existing,LinearLayout list,String selectedDate){LinearLayout f=dialogForm();EditText title=field("Event title",1),details=field("Details",1),date=field("Date (YYYY-MM-DD)",1),start=field("Start time (HH:MM)",1),end=field("End time (HH:MM)",1),category=field("Category: Focus, Meeting, Personal, Deadline",1);date.setText(selectedDate);category.setText("Focus");if(existing!=null){title.setText(existing.optString("title"));details.setText(existing.optString("details"));date.setText(existing.optString("event_date"));start.setText(existing.optString("start_time"));end.setText(existing.optString("end_time"));category.setText(existing.optString("category","Focus"));}for(EditText x:new EditText[]{title,details,date,start,end,category})f.addView(x);AlertDialog d=new AlertDialog.Builder(this).setTitle(existing==null?"Schedule event":"Edit event").setView(f).setNegativeButton("Cancel",null).setPositiveButton("Save",null).create();d.setOnShowListener(x->d.getButton(-1).setOnClickListener(v->{if(title.getText().toString().trim().isEmpty()||date.getText().toString().trim().isEmpty())return;JSONObject b=obj("user_id",user.optString("id"),"title",title.getText().toString().trim(),"details",emptyNull(details),"event_date",date.getText().toString().trim(),"start_time",emptyNull(start),"end_time",emptyNull(end),"category",category.getText().toString().trim(),"updated_at",now());SupabaseApi.Callback cb=(r,e)->{if(e!=null)toast("Could not save event");else{d.dismiss();loadEvents(list,date.getText().toString());}};if(existing==null)api.insert("calendar_events",b,cb);else api.update("calendar_events",SupabaseApi.eq("id",existing.optString("id")),b,cb);}));d.show();}
-    private void eventActions(JSONObject event,LinearLayout list,String date){new AlertDialog.Builder(this).setTitle(event.optString("title")).setItems(new String[]{"Edit","Delete"},(d,w)->{if(w==0)eventDialog(event,list,date);else confirmDelete("event",event,"calendar_events",list,(l)->loadEvents(l,date));}).show();}
+        timer = null;
+        user = null;
 
-    private void showFocus(){if(!loggedIn())return;activePage="Focus";focusScreen=new FocusScreen(this,prefs,timeLeft);shell("Focus",focusScreen);focusScreen.bind();}
-    private void focusOptions(TextView label,TextView countdown,Button start){new AlertDialog.Builder(this).setTitle("Focus technique").setItems(new String[]{"Pomodoro (25/5/15)","52/17 rule", "Flowtime (90/10/25)"},(d,w)->{String[] names={"Pomodoro","52/17 rule","Flowtime"};prefs.edit().putString("focus_tech",names[w]).putString("focus_mode","Work").apply();timeLeft=duration();label.setText(names[w]+" · Work");countdown.setText(format(timeLeft));start.setText("Start");}).show();}
-    private long duration(){String t=prefs.getString("focus_tech","Pomodoro");return (t.equals("52/17 rule")?52:t.equals("Flowtime")?90:25)*60_000L;}
+        prefs.edit()
+                .remove("userEmail")
+                .apply();
 
-    private void showProfile(){if(!loggedIn())return;activePage="Settings";SettingsScreen screen=new SettingsScreen(this,api,user,this::signOut);shell("Profile & settings",screen);screen.bind();}
-    private void featureDialog(){String[] names={"Notes","Calendar","Todo","Goals"};boolean[] selected=new boolean[4];String values=user.optString("features","");for(int i=0;i<4;i++)selected[i]=values.isEmpty()||values.contains(names[i]);new AlertDialog.Builder(this).setTitle("Dashboard features").setMultiChoiceItems(names,selected,(d,w,on)->selected[w]=on).setPositiveButton("Save",(d,w)->{JSONArray a=new JSONArray();for(int i=0;i<4;i++)if(selected[i])a.put(names[i]);api.update("users",SupabaseApi.eq("id",user.optString("id")),obj("features",a),(r,e)->{if(e==null){user=obj("id",user.optString("id"),"full_name",user.optString("full_name"),"email",user.optString("email"),"features",a);toast("Features updated");}else toast("Could not update features");});}).setNegativeButton("Cancel",null).show();}
+        showLogin();
+    }
 
-    private interface ListLoader { void load(LinearLayout list); }
-    private void confirmDelete(String label,JSONObject item,String table,LinearLayout list,ListLoader reload){new AlertDialog.Builder(this).setTitle("Delete "+label+"?").setMessage("This cannot be undone.").setNegativeButton("Cancel",null).setPositiveButton("Delete",(d,w)->api.delete(table,SupabaseApi.eq("id",item.optString("id")),(r,e)->{if(e!=null)toast("Could not delete "+label);else reload.load(list);})).show();}
-    private LinearLayout dialogForm(){return new FeatureUi(this).dialogForm();}
-    private EditText field(String hint,int type){return new FeatureUi(this).field(hint,type);}
-    private void entityRow(LinearLayout parent,JSONObject item,String title,String subtitle,View.OnClickListener click){new FeatureUi(this).row(parent,title,subtitle,click);}
-    private TextView text(String value,int size,int color){return new FeatureUi(this).text(value,size,color);}
-    private void toast(String s){Toast.makeText(this,s,Toast.LENGTH_LONG).show();}
-    private String first(String s){return s.trim().isEmpty()?"there":s.trim().split("\\s+")[0];} private String today(){return new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date());} private String now(){return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX",Locale.US).format(new Date());} private String format(long ms){long s=Math.max(0,ms)/1000;return String.format(Locale.US,"%02d:%02d",s/60,s%60);} private String strip(String s){return s.replaceAll("<[^>]*>","").replace("&nbsp;"," ");} private Object emptyNull(EditText input){String s=input.getText().toString().trim();return s.isEmpty()?JSONObject.NULL:s;} private double number(EditText input,double fallback){try{return Double.parseDouble(input.getText().toString().trim());}catch(Exception e){return fallback;}}
-    private JSONObject obj(Object... values){JSONObject o=new JSONObject();try{for(int i=0;i<values.length;i+=2)o.put(String.valueOf(values[i]),values[i+1]);}catch(Exception ignored){}return o;}
+    private void showDashboard() {
+        if (!loggedIn()) {
+            return;
+        }
+
+        activePage = "Overview";
+
+        DashboardScreen screen =
+                new DashboardScreen(this, user);
+
+        shell("Stride.", screen);
+
+        screen.bind(
+                this::showNotes,
+                this::showCalendar,
+                this::showTasks,
+                this::showGoals,
+                this::showFocus
+        );
+    }
+
+    private void showTasks() {
+        if (!loggedIn()) {
+            return;
+        }
+
+        activePage = "Tasks";
+
+        TasksScreen screen =
+                new TasksScreen(this, api, user);
+
+        shell("Tasks", screen);
+
+        screen.bind();
+    }
+
+    private void loadTasks(
+            LinearLayout list,
+            String filter
+    ) {
+        list.removeAllViews();
+
+        api.get(
+                "tasks",
+                SupabaseApi.and(
+                        "select=*",
+                        SupabaseApi.eq(
+                                "user_id",
+                                user.optString("id")
+                        ),
+                        "order=created_at.desc"
+                ),
+                (rows, error) -> {
+
+                    if (error != null) {
+                        list.addView(
+                                text(
+                                        "Could not load tasks.",
+                                        16,
+                                        MUTED
+                                )
+                        );
+
+                        return;
+                    }
+
+                    if (rows.length() == 0) {
+                        list.addView(
+                                text(
+                                        "No tasks yet.",
+                                        16,
+                                        MUTED
+                                )
+                        );
+                    }
+
+                    for (int i = 0; i < rows.length(); i++) {
+                        JSONObject task =
+                                rows.optJSONObject(i);
+
+                        if (!filter.equals("all")
+                                && !filter.equals(
+                                task.optString("status")
+                        )) {
+                            continue;
+                        }
+
+                        entityRow(
+                                list,
+                                task,
+                                task.optString("title"),
+                                task.optString(
+                                        "priority",
+                                        "Medium"
+                                )
+                                        + " · "
+                                        + task.optString(
+                                        "status",
+                                        "todo"
+                                )
+                                        + (
+                                        task.optString(
+                                                "due_date"
+                                        ).isEmpty()
+                                                ? ""
+                                                : " · "
+                                                + task.optString(
+                                                "due_date"
+                                        )
+                                ),
+                                v -> taskActions(
+                                        task,
+                                        list
+                                )
+                        );
+                    }
+                }
+        );
+    }
+
+    private void taskDialog(
+            JSONObject existing,
+            LinearLayout list
+    ) {
+        LinearLayout f = dialogForm();
+
+        EditText title = field(
+                "What needs to be done?",
+                1
+        );
+
+        EditText details = field(
+                "Details (optional)",
+                1
+        );
+
+        EditText due = field(
+                "Due date (YYYY-MM-DD)",
+                1
+        );
+
+        EditText priority = field(
+                "Priority: Low, Medium, or High",
+                1
+        );
+
+        if (existing != null) {
+            title.setText(
+                    existing.optString("title")
+            );
+
+            details.setText(
+                    existing.optString("details")
+            );
+
+            due.setText(
+                    existing.optString("due_date")
+            );
+
+            priority.setText(
+                    existing.optString(
+                            "priority",
+                            "Medium"
+                    )
+            );
+        } else {
+            priority.setText("Medium");
+        }
+
+        f.addView(title);
+        f.addView(details);
+        f.addView(due);
+        f.addView(priority);
+
+        AlertDialog d =
+                new AlertDialog.Builder(this)
+                        .setTitle(
+                                existing == null
+                                        ? "New task"
+                                        : "Edit task"
+                        )
+                        .setView(f)
+                        .setNegativeButton(
+                                "Cancel",
+                                null
+                        )
+                        .setPositiveButton(
+                                existing == null
+                                        ? "Create"
+                                        : "Update",
+                                null
+                        )
+                        .create();
+
+        d.setOnShowListener(x ->
+                d.getButton(-1).setOnClickListener(v -> {
+
+                    if (title.getText()
+                            .toString()
+                            .trim()
+                            .isEmpty()) {
+                        return;
+                    }
+
+                    JSONObject b = obj(
+                            "user_id",
+                            user.optString("id"),
+                            "title",
+                            title.getText()
+                                    .toString()
+                                    .trim(),
+                            "details",
+                            emptyNull(details),
+                            "due_date",
+                            emptyNull(due),
+                            "priority",
+                            priority.getText()
+                                    .toString()
+                                    .trim(),
+                            "updated_at",
+                            now()
+                    );
+
+                    SupabaseApi.Callback done =
+                            (r, e) -> {
+                                if (e != null) {
+                                    toast(
+                                            "Could not save task"
+                                    );
+                                } else {
+                                    d.dismiss();
+                                    loadTasks(
+                                            list,
+                                            "all"
+                                    );
+                                }
+                            };
+
+                    if (existing == null) {
+                        api.insert(
+                                "tasks",
+                                obj(
+                                        "user_id",
+                                        user.optString("id"),
+                                        "title",
+                                        title.getText()
+                                                .toString()
+                                                .trim(),
+                                        "details",
+                                        emptyNull(details),
+                                        "due_date",
+                                        emptyNull(due),
+                                        "priority",
+                                        priority.getText()
+                                                .toString()
+                                                .trim(),
+                                        "status",
+                                        "todo",
+                                        "updated_at",
+                                        now()
+                                ),
+                                done
+                        );
+                    } else {
+                        api.update(
+                                "tasks",
+                                SupabaseApi.eq(
+                                        "id",
+                                        existing.optString("id")
+                                ),
+                                b,
+                                done
+                        );
+                    }
+                })
+        );
+
+        d.show();
+    }
+
+    private void taskActions(
+            JSONObject task,
+            LinearLayout list
+    ) {
+        String[] choices = {
+                "Mark To Do",
+                "Mark Active",
+                "Mark Done",
+                "Edit",
+                "Delete"
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle(
+                        task.optString("title")
+                )
+                .setItems(
+                        choices,
+                        (d, w) -> {
+                            if (w < 3) {
+                                api.update(
+                                        "tasks",
+                                        SupabaseApi.eq(
+                                                "id",
+                                                task.optString("id")
+                                        ),
+                                        obj(
+                                                "status",
+                                                new String[]{
+                                                        "todo",
+                                                        "doing",
+                                                        "done"
+                                                }[w],
+                                                "updated_at",
+                                                now()
+                                        ),
+                                        (r, e) ->
+                                                loadTasks(
+                                                        list,
+                                                        "all"
+                                                )
+                                );
+
+                            } else if (w == 3) {
+                                taskDialog(task, list);
+
+                            } else {
+                                confirmDelete(
+                                        "task",
+                                        task,
+                                        "tasks",
+                                        list,
+                                        l -> loadTasks(
+                                                l,
+                                                "all"
+                                        )
+                                );
+                            }
+                        }
+                )
+                .show();
+    }
+
+    private void showNotes() {
+        if (!loggedIn()) {
+            return;
+        }
+
+        activePage = "Notes";
+
+        NotesScreen screen =
+                new NotesScreen(this, api, user);
+
+        shell("Notes", screen);
+
+        screen.bind();
+    }
+
+    private void loadNotes(
+            LinearLayout list
+    ) {
+        list.removeAllViews();
+
+        api.get(
+                "notes",
+                SupabaseApi.and(
+                        "select=*",
+                        SupabaseApi.eq(
+                                "user_id",
+                                user.optString("id")
+                        ),
+                        "order=updated_at.desc"
+                ),
+                (rows, e) -> {
+
+                    if (e != null) {
+                        list.addView(
+                                text(
+                                        "Could not load notes.",
+                                        16,
+                                        MUTED
+                                )
+                        );
+
+                        return;
+                    }
+
+                    if (rows.length() == 0) {
+                        list.addView(
+                                text(
+                                        "No notes yet.",
+                                        16,
+                                        MUTED
+                                )
+                        );
+                    }
+
+                    for (int i = 0; i < rows.length(); i++) {
+                        JSONObject note =
+                                rows.optJSONObject(i);
+
+                        entityRow(
+                                list,
+                                note,
+                                note.optString(
+                                        "title",
+                                        "Untitled Note"
+                                ),
+                                strip(
+                                        note.optString("content")
+                                ),
+                                v -> noteEditor(
+                                        note,
+                                        list
+                                )
+                        );
+                    }
+                }
+        );
+    }
+
+    private void noteEditor(
+            JSONObject existing,
+            LinearLayout list
+    ) {
+        LinearLayout f = dialogForm();
+
+        EditText title = field(
+                "Title",
+                1
+        );
+
+        EditText body = field(
+                "Write something worth remembering…",
+                1
+        );
+
+        body.setMinLines(7);
+        body.setGravity(Gravity.TOP);
+
+        if (existing != null) {
+            title.setText(
+                    existing.optString("title")
+            );
+
+            body.setText(
+                    existing.optString("content")
+            );
+        }
+
+        f.addView(title);
+        f.addView(body);
+
+        AlertDialog d =
+                new AlertDialog.Builder(this)
+                        .setTitle(
+                                existing == null
+                                        ? "New note"
+                                        : "Edit note"
+                        )
+                        .setView(f)
+                        .setNegativeButton(
+                                "Cancel",
+                                null
+                        )
+                        .setNeutralButton(
+                                existing == null
+                                        ? ""
+                                        : "Delete",
+                                null
+                        )
+                        .setPositiveButton(
+                                "Save",
+                                null
+                        )
+                        .create();
+
+        d.setOnShowListener(x -> {
+
+            d.getButton(-1).setOnClickListener(v -> {
+
+                JSONObject b = obj(
+                        "user_id",
+                        user.optString("id"),
+                        "title",
+                        title.getText()
+                                .toString()
+                                .trim()
+                                .isEmpty()
+                                ? "Untitled Note"
+                                : title.getText()
+                                .toString()
+                                .trim(),
+                        "content",
+                        body.getText().toString(),
+                        "updated_at",
+                        now()
+                );
+
+                SupabaseApi.Callback cb =
+                        (r, e) -> {
+                            if (e != null) {
+                                toast(
+                                        "Could not save note"
+                                );
+                            } else {
+                                d.dismiss();
+                                loadNotes(list);
+                            }
+                        };
+
+                if (existing == null) {
+                    api.insert(
+                            "notes",
+                            b,
+                            cb
+                    );
+                } else {
+                    api.update(
+                            "notes",
+                            SupabaseApi.eq(
+                                    "id",
+                                    existing.optString("id")
+                            ),
+                            b,
+                            cb
+                    );
+                }
+            });
+
+            if (existing != null) {
+                d.getButton(-3).setOnClickListener(
+                        v -> confirmDelete(
+                                "note",
+                                existing,
+                                "notes",
+                                list,
+                                this::loadNotes
+                        )
+                );
+            }
+        });
+
+        d.show();
+    }
+
+    private void showGoals() {
+        if (!loggedIn()) {
+            return;
+        }
+
+        activePage = "Goals";
+
+        GoalsScreen screen =
+                new GoalsScreen(this, api, user);
+
+        shell("Goals", screen);
+
+        screen.bind();
+    }
+
+    private void loadGoals(
+            LinearLayout list
+    ) {
+        list.removeAllViews();
+
+        api.get(
+                "goals",
+                SupabaseApi.and(
+                        "select=*",
+                        SupabaseApi.eq(
+                                "user_id",
+                                user.optString("id")
+                        ),
+                        "order=created_at.desc"
+                ),
+                (rows, e) -> {
+
+                    if (e != null) {
+                        list.addView(
+                                text(
+                                        "Could not load goals.",
+                                        16,
+                                        MUTED
+                                )
+                        );
+
+                        return;
+                    }
+
+                    if (rows.length() == 0) {
+                        list.addView(
+                                text(
+                                        "No goals yet.",
+                                        16,
+                                        MUTED
+                                )
+                        );
+                    }
+
+                    for (int i = 0; i < rows.length(); i++) {
+                        JSONObject g =
+                                rows.optJSONObject(i);
+
+                        double t = g.optDouble(
+                                "target_value",
+                                100
+                        );
+
+                        double c = g.optDouble(
+                                "current_value",
+                                0
+                        );
+
+                        entityRow(
+                                list,
+                                g,
+                                g.optString("title"),
+                                String.format(
+                                        Locale.US,
+                                        "%.0f / %.0f %s",
+                                        c,
+                                        t,
+                                        g.optString(
+                                                "unit",
+                                                "%"
+                                        )
+                                ),
+                                v -> goalActions(
+                                        g,
+                                        list
+                                )
+                        );
+                    }
+                }
+        );
+    }
+
+    private void goalDialog(
+            JSONObject existing,
+            LinearLayout list
+    ) {
+        LinearLayout f = dialogForm();
+
+        EditText title = field(
+                "Goal title",
+                1
+        );
+
+        EditText notes = field(
+                "Notes",
+                1
+        );
+
+        EditText target = field(
+                "Target value",
+                2
+        );
+
+        EditText current = field(
+                "Current value",
+                2
+        );
+
+        EditText unit = field(
+                "Unit (%, pages, sessions)",
+                1
+        );
+
+        EditText date = field(
+                "Target date (YYYY-MM-DD)",
+                1
+        );
+
+        if (existing != null) {
+            title.setText(
+                    existing.optString("title")
+            );
+
+            notes.setText(
+                    existing.optString("notes")
+            );
+
+            target.setText(
+                    existing.optString(
+                            "target_value",
+                            "100"
+                    )
+            );
+
+            current.setText(
+                    existing.optString(
+                            "current_value",
+                            "0"
+                    )
+            );
+
+            unit.setText(
+                    existing.optString(
+                            "unit",
+                            "%"
+                    )
+            );
+
+            date.setText(
+                    existing.optString("target_date")
+            );
+
+        } else {
+            target.setText("100");
+            current.setText("0");
+            unit.setText("%");
+        }
+
+        for (EditText x : new EditText[]{
+                title,
+                notes,
+                target,
+                current,
+                unit,
+                date
+        }) {
+            f.addView(x);
+        }
+
+        AlertDialog d =
+                new AlertDialog.Builder(this)
+                        .setTitle(
+                                existing == null
+                                        ? "New goal"
+                                        : "Edit goal"
+                        )
+                        .setView(f)
+                        .setNegativeButton(
+                                "Cancel",
+                                null
+                        )
+                        .setPositiveButton(
+                                "Save",
+                                null
+                        )
+                        .create();
+
+        d.setOnShowListener(x ->
+                d.getButton(-1).setOnClickListener(v -> {
+
+                    if (title.getText()
+                            .toString()
+                            .trim()
+                            .isEmpty()) {
+                        return;
+                    }
+
+                    JSONObject b = obj(
+                            "user_id",
+                            user.optString("id"),
+                            "title",
+                            title.getText()
+                                    .toString()
+                                    .trim(),
+                            "notes",
+                            emptyNull(notes),
+                            "target_value",
+                            number(target, 100),
+                            "current_value",
+                            number(current, 0),
+                            "unit",
+                            unit.getText()
+                                    .toString()
+                                    .trim(),
+                            "target_date",
+                            emptyNull(date),
+                            "updated_at",
+                            now()
+                    );
+
+                    SupabaseApi.Callback cb =
+                            (r, e) -> {
+                                if (e != null) {
+                                    toast(
+                                            "Could not save goal"
+                                    );
+                                } else {
+                                    d.dismiss();
+                                    loadGoals(list);
+                                }
+                            };
+
+                    if (existing == null) {
+                        api.insert(
+                                "goals",
+                                b,
+                                cb
+                        );
+                    } else {
+                        api.update(
+                                "goals",
+                                SupabaseApi.eq(
+                                        "id",
+                                        existing.optString("id")
+                                ),
+                                b,
+                                cb
+                        );
+                    }
+                })
+        );
+
+        d.show();
+    }
+
+    private void goalActions(
+            JSONObject goal,
+            LinearLayout list
+    ) {
+        new AlertDialog.Builder(this)
+                .setTitle(
+                        goal.optString("title")
+                )
+                .setItems(
+                        new String[]{
+                                "Update progress",
+                                "Edit",
+                                "Delete"
+                        },
+                        (d, w) -> {
+
+                            if (w == 0) {
+                                EditText value = field(
+                                        "Current value",
+                                        2
+                                );
+
+                                value.setText(
+                                        goal.optString(
+                                                "current_value"
+                                        )
+                                );
+
+                                new AlertDialog.Builder(this)
+                                        .setTitle(
+                                                "Update progress"
+                                        )
+                                        .setView(value)
+                                        .setPositiveButton(
+                                                "Save",
+                                                (a, b) ->
+                                                        api.update(
+                                                                "goals",
+                                                                SupabaseApi.eq(
+                                                                        "id",
+                                                                        goal.optString(
+                                                                                "id"
+                                                                        )
+                                                                ),
+                                                                obj(
+                                                                        "current_value",
+                                                                        number(
+                                                                                value,
+                                                                                0
+                                                                        ),
+                                                                        "updated_at",
+                                                                        now()
+                                                                ),
+                                                                (r, e) ->
+                                                                        loadGoals(
+                                                                                list
+                                                                        )
+                                                        )
+                                        )
+                                        .setNegativeButton(
+                                                "Cancel",
+                                                null
+                                        )
+                                        .show();
+
+                            } else if (w == 1) {
+                                goalDialog(
+                                        goal,
+                                        list
+                                );
+
+                            } else {
+                                confirmDelete(
+                                        "goal",
+                                        goal,
+                                        "goals",
+                                        list,
+                                        this::loadGoals
+                                );
+                            }
+                        }
+                )
+                .show();
+    }
+
+    private void showCalendar() {
+        if (!loggedIn()) {
+            return;
+        }
+
+        activePage = "Calendar";
+
+        CalendarScreen screen =
+                new CalendarScreen(
+                        this,
+                        api,
+                        user
+                );
+
+        shell(
+                "Smart Calendar",
+                screen
+        );
+
+        screen.bind();
+    }
+
+    private void loadEvents(
+            LinearLayout list,
+            String date
+    ) {
+        list.removeAllViews();
+
+        api.get(
+                "calendar_events",
+                SupabaseApi.and(
+                        "select=*",
+                        SupabaseApi.eq(
+                                "user_id",
+                                user.optString("id")
+                        ),
+                        SupabaseApi.eq(
+                                "event_date",
+                                date
+                        ),
+                        "order=start_time.asc"
+                ),
+                (rows, e) -> {
+
+                    if (e != null) {
+                        list.addView(
+                                text(
+                                        "Could not load events.",
+                                        16,
+                                        MUTED
+                                )
+                        );
+
+                        return;
+                    }
+
+                    if (rows.length() == 0) {
+                        list.addView(
+                                text(
+                                        "Free day!",
+                                        16,
+                                        MUTED
+                                )
+                        );
+                    }
+
+                    for (int i = 0; i < rows.length(); i++) {
+                        JSONObject event =
+                                rows.optJSONObject(i);
+
+                        entityRow(
+                                list,
+                                event,
+                                event.optString("title"),
+                                event.optString(
+                                        "category",
+                                        "Focus"
+                                )
+                                        + " · "
+                                        + event.optString(
+                                        "start_time",
+                                        "Any time"
+                                ),
+                                v -> eventActions(
+                                        event,
+                                        list,
+                                        date
+                                )
+                        );
+                    }
+                }
+        );
+    }
+
+    private void eventDialog(
+            JSONObject existing,
+            LinearLayout list,
+            String selectedDate
+    ) {
+        LinearLayout f = dialogForm();
+
+        EditText title = field(
+                "Event title",
+                1
+        );
+
+        EditText details = field(
+                "Details",
+                1
+        );
+
+        EditText date = field(
+                "Date (YYYY-MM-DD)",
+                1
+        );
+
+        EditText start = field(
+                "Start time (HH:MM)",
+                1
+        );
+
+        EditText end = field(
+                "End time (HH:MM)",
+                1
+        );
+
+        EditText category = field(
+                "Category: Focus, Meeting, Personal, Deadline",
+                1
+        );
+
+        date.setText(selectedDate);
+        category.setText("Focus");
+
+        if (existing != null) {
+            title.setText(
+                    existing.optString("title")
+            );
+
+            details.setText(
+                    existing.optString("details")
+            );
+
+            date.setText(
+                    existing.optString("event_date")
+            );
+
+            start.setText(
+                    existing.optString("start_time")
+            );
+
+            end.setText(
+                    existing.optString("end_time")
+            );
+
+            category.setText(
+                    existing.optString(
+                            "category",
+                            "Focus"
+                    )
+            );
+        }
+
+        for (EditText x : new EditText[]{
+                title,
+                details,
+                date,
+                start,
+                end,
+                category
+        }) {
+            f.addView(x);
+        }
+
+        AlertDialog d =
+                new AlertDialog.Builder(this)
+                        .setTitle(
+                                existing == null
+                                        ? "Schedule event"
+                                        : "Edit event"
+                        )
+                        .setView(f)
+                        .setNegativeButton(
+                                "Cancel",
+                                null
+                        )
+                        .setPositiveButton(
+                                "Save",
+                                null
+                        )
+                        .create();
+
+        d.setOnShowListener(x ->
+                d.getButton(-1).setOnClickListener(v -> {
+
+                    if (title.getText()
+                            .toString()
+                            .trim()
+                            .isEmpty()
+                            || date.getText()
+                            .toString()
+                            .trim()
+                            .isEmpty()) {
+                        return;
+                    }
+
+                    JSONObject b = obj(
+                            "user_id",
+                            user.optString("id"),
+                            "title",
+                            title.getText()
+                                    .toString()
+                                    .trim(),
+                            "details",
+                            emptyNull(details),
+                            "event_date",
+                            date.getText()
+                                    .toString()
+                                    .trim(),
+                            "start_time",
+                            emptyNull(start),
+                            "end_time",
+                            emptyNull(end),
+                            "category",
+                            category.getText()
+                                    .toString()
+                                    .trim(),
+                            "updated_at",
+                            now()
+                    );
+
+                    SupabaseApi.Callback cb =
+                            (r, e) -> {
+                                if (e != null) {
+                                    toast(
+                                            "Could not save event"
+                                    );
+                                } else {
+                                    d.dismiss();
+
+                                    loadEvents(
+                                            list,
+                                            date.getText()
+                                                    .toString()
+                                    );
+                                }
+                            };
+
+                    if (existing == null) {
+                        api.insert(
+                                "calendar_events",
+                                b,
+                                cb
+                        );
+                    } else {
+                        api.update(
+                                "calendar_events",
+                                SupabaseApi.eq(
+                                        "id",
+                                        existing.optString("id")
+                                ),
+                                b,
+                                cb
+                        );
+                    }
+                })
+        );
+
+        d.show();
+    }
+
+    private void eventActions(
+            JSONObject event,
+            LinearLayout list,
+            String date
+    ) {
+        new AlertDialog.Builder(this)
+                .setTitle(
+                        event.optString("title")
+                )
+                .setItems(
+                        new String[]{
+                                "Edit",
+                                "Delete"
+                        },
+                        (d, w) -> {
+                            if (w == 0) {
+                                eventDialog(
+                                        event,
+                                        list,
+                                        date
+                                );
+                            } else {
+                                confirmDelete(
+                                        "event",
+                                        event,
+                                        "calendar_events",
+                                        list,
+                                        l -> loadEvents(
+                                                l,
+                                                date
+                                        )
+                                );
+                            }
+                        }
+                )
+                .show();
+    }
+
+    private void showFocus() {
+        if (!loggedIn()) {
+            return;
+        }
+
+        activePage = "Focus";
+
+        focusScreen = new FocusScreen(
+                this,
+                prefs,
+                timeLeft
+        );
+
+        shell(
+                "Focus",
+                focusScreen
+        );
+
+        focusScreen.bind();
+    }
+
+    private void focusOptions(
+            TextView label,
+            TextView countdown,
+            Button start
+    ) {
+        new AlertDialog.Builder(this)
+                .setTitle("Focus technique")
+                .setItems(
+                        new String[]{
+                                "Pomodoro (25/5/15)",
+                                "52/17 rule",
+                                "Flowtime (90/10/25)"
+                        },
+                        (d, w) -> {
+                            String[] names = {
+                                    "Pomodoro",
+                                    "52/17 rule",
+                                    "Flowtime"
+                            };
+
+                            prefs.edit()
+                                    .putString(
+                                            "focus_tech",
+                                            names[w]
+                                    )
+                                    .putString(
+                                            "focus_mode",
+                                            "Work"
+                                    )
+                                    .apply();
+
+                            timeLeft = duration();
+
+                            label.setText(
+                                    names[w] + " · Work"
+                            );
+
+                            countdown.setText(
+                                    format(timeLeft)
+                            );
+
+                            start.setText("Start");
+                        }
+                )
+                .show();
+    }
+
+    private long duration() {
+        String t = prefs.getString(
+                "focus_tech",
+                "Pomodoro"
+        );
+
+        return (
+                t.equals("52/17 rule")
+                        ? 52
+                        : t.equals("Flowtime")
+                        ? 90
+                        : 25
+        ) * 60_000L;
+    }
+
+    private void showProfile() {
+        if (!loggedIn()) {
+            return;
+        }
+
+        activePage = "Settings";
+
+        SettingsScreen screen =
+                new SettingsScreen(
+                        this,
+                        api,
+                        user,
+                        this::signOut
+                );
+
+        shell(
+                "Profile & settings",
+                screen
+        );
+
+        screen.bind();
+    }
+
+    private void featureDialog() {
+        String[] names = {
+                "Notes",
+                "Calendar",
+                "Todo",
+                "Goals"
+        };
+
+        boolean[] selected =
+                new boolean[4];
+
+        String values =
+                user.optString(
+                        "features",
+                        ""
+                );
+
+        for (int i = 0; i < 4; i++) {
+            selected[i] =
+                    values.isEmpty()
+                            || values.contains(names[i]);
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(
+                        "Dashboard features"
+                )
+                .setMultiChoiceItems(
+                        names,
+                        selected,
+                        (d, w, on) ->
+                                selected[w] = on
+                )
+                .setPositiveButton(
+                        "Save",
+                        (d, w) -> {
+                            JSONArray a =
+                                    new JSONArray();
+
+                            for (int i = 0; i < 4; i++) {
+                                if (selected[i]) {
+                                    a.put(names[i]);
+                                }
+                            }
+
+                            api.update(
+                                    "users",
+                                    SupabaseApi.eq(
+                                            "id",
+                                            user.optString("id")
+                                    ),
+                                    obj(
+                                            "features",
+                                            a
+                                    ),
+                                    (r, e) -> {
+                                        if (e == null) {
+                                            user = obj(
+                                                    "id",
+                                                    user.optString("id"),
+                                                    "full_name",
+                                                    user.optString(
+                                                            "full_name"
+                                                    ),
+                                                    "email",
+                                                    user.optString(
+                                                            "email"
+                                                    ),
+                                                    "features",
+                                                    a
+                                            );
+
+                                            toast(
+                                                    "Features updated"
+                                            );
+                                        } else {
+                                            toast(
+                                                    "Could not update features"
+                                            );
+                                        }
+                                    }
+                            );
+                        }
+                )
+                .setNegativeButton(
+                        "Cancel",
+                        null
+                )
+                .show();
+    }
+
+    private interface ListLoader {
+        void load(LinearLayout list);
+    }
+
+    private void confirmDelete(
+            String label,
+            JSONObject item,
+            String table,
+            LinearLayout list,
+            ListLoader reload
+    ) {
+        new AlertDialog.Builder(this)
+                .setTitle(
+                        "Delete " + label + "?"
+                )
+                .setMessage(
+                        "This cannot be undone."
+                )
+                .setNegativeButton(
+                        "Cancel",
+                        null
+                )
+                .setPositiveButton(
+                        "Delete",
+                        (d, w) ->
+                                api.delete(
+                                        table,
+                                        SupabaseApi.eq(
+                                                "id",
+                                                item.optString("id")
+                                        ),
+                                        (r, e) -> {
+                                            if (e != null) {
+                                                toast(
+                                                        "Could not delete "
+                                                                + label
+                                                );
+                                            } else {
+                                                reload.load(list);
+                                            }
+                                        }
+                                )
+                )
+                .show();
+    }
+
+    private LinearLayout dialogForm() {
+        return new FeatureUi(this)
+                .dialogForm();
+    }
+
+    private EditText field(
+            String hint,
+            int type
+    ) {
+        return new FeatureUi(this)
+                .field(hint, type);
+    }
+
+    private void entityRow(
+            LinearLayout parent,
+            JSONObject item,
+            String title,
+            String subtitle,
+            View.OnClickListener click
+    ) {
+        new FeatureUi(this)
+                .row(
+                        parent,
+                        title,
+                        subtitle,
+                        click
+                );
+    }
+
+    private TextView text(
+            String value,
+            int size,
+            int color
+    ) {
+        return new FeatureUi(this)
+                .text(
+                        value,
+                        size,
+                        color
+                );
+    }
+
+    private void toast(String s) {
+        Toast.makeText(
+                this,
+                s,
+                Toast.LENGTH_LONG
+        ).show();
+    }
+
+    private String first(String s) {
+        return s.trim().isEmpty()
+                ? "there"
+                : s.trim().split("\\s+")[0];
+    }
+
+    private String today() {
+        return new SimpleDateFormat(
+                "yyyy-MM-dd",
+                Locale.US
+        ).format(new Date());
+    }
+
+    private String now() {
+        return new SimpleDateFormat(
+                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+                Locale.US
+        ).format(new Date());
+    }
+
+    private String format(long ms) {
+        long s = Math.max(0, ms) / 1000;
+
+        return String.format(
+                Locale.US,
+                "%02d:%02d",
+                s / 60,
+                s % 60
+        );
+    }
+
+    private String strip(String s) {
+        return s
+                .replaceAll("<[^>]*>", "")
+                .replace("&nbsp;", " ");
+    }
+
+    private Object emptyNull(
+            EditText input
+    ) {
+        String s = input.getText()
+                .toString()
+                .trim();
+
+        return s.isEmpty()
+                ? JSONObject.NULL
+                : s;
+    }
+
+    private double number(
+            EditText input,
+            double fallback
+    ) {
+        try {
+            return Double.parseDouble(
+                    input.getText()
+                            .toString()
+                            .trim()
+            );
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
+
+    private JSONObject obj(
+            Object... values
+    ) {
+        JSONObject o = new JSONObject();
+
+        try {
+            for (int i = 0; i < values.length; i += 2) {
+                o.put(
+                        String.valueOf(values[i]),
+                        values[i + 1]
+                );
+            }
+        } catch (Exception ignored) {
+        }
+
+        return o;
+    }
 }
