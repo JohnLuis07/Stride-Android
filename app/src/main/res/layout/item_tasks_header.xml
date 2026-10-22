@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:letterSpacing="0.14"
+        android:text="@string/tasks_eyebrow"
+        android:textColor="@color/tasks_accent"
+        android:textSize="11sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:accessibilityHeading="true"
+        android:text="@string/tasks_title"
+        android:textColor="@color/tasks_ink"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/tasks_subtitle"
+        android:textColor="@color/tasks_muted"
+        android:textSize="15sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_tasks_hero"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tasks_hero_title"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="3dp"
+            android:text="@string/tasks_hero_subtitle"
+            android:textColor="@color/tasks_hero_text"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/progress_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@android:color/white"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/progress_percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/completion_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginTop="10dp"
+            android:max="100"
+            android:progressDrawable="@drawable/bg_tasks_progress" />
+
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_tasks_card"
+            android:backgroundTint="@null"
+            android:elevation="0dp"
+            android:translationZ="0dp"
+            android:stateListAnimator="@null"
+            android:drawableStart="@drawable/ic_workspace_tasks"
+            android:drawableTint="@color/tasks_accent"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:text="@string/tasks_new"
+            android:textAllCaps="false"
+            android:textColor="@color/tasks_accent"
+            android:fontFamily="sans-serif-medium" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            style="@style/StrideTaskStat"
+            android:layout_marginEnd="6dp">
+
+            <TextView
+                style="@style/StrideTaskStatLabel"
+                android:text="@string/tasks_total" />
+
+            <TextView
+                android:id="@+id/total_count"
+                style="@style/StrideTaskStatValue"
+                android:textColor="@color/tasks_accent" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/StrideTaskStat"
+            android:layout_marginStart="6dp">
+
+            <TextView
+                style="@style/StrideTaskStatLabel"
+                android:text="@string/tasks_todo" />
+
+            <TextView
+                android:id="@+id/todo_count"
+                style="@style/StrideTaskStatValue" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            style="@style/StrideTaskStat"
+            android:layout_marginEnd="6dp">
+
+            <TextView
+                style="@style/StrideTaskStatLabel"
+                android:text="@string/tasks_doing" />
+
+            <TextView
+                android:id="@+id/doing_count"
+                style="@style/StrideTaskStatValue"
+                android:textColor="@color/tasks_medium" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/StrideTaskStat"
+            android:layout_marginStart="6dp">
+
+            <TextView
+                style="@style/StrideTaskStatLabel"
+                android:text="@string/tasks_done" />
+
+            <TextView
+                android:id="@+id/done_count"
+                style="@style/StrideTaskStatValue"
+                android:textColor="@color/tasks_low" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:accessibilityHeading="true"
+            android:text="@string/tasks_your_tasks"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/tasks_ink" />
+        <Button
+            android:id="@+id/refresh_button"
+            style="@style/StrideTaskChip"
+            android:text="@string/tasks_refresh" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:requiresFadingEdge="none"
+        android:scrollbars="none">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/filter_all"
+                style="@style/StrideTaskChip"
+                android:text="@string/tasks_all" />
+
+            <Button
+                android:id="@+id/filter_todo"
+                style="@style/StrideTaskChip"
+                android:text="@string/tasks_todo" />
+
+            <Button
+                android:id="@+id/filter_doing"
+                style="@style/StrideTaskChip"
+                android:text="@string/tasks_doing" />
+
+            <Button
+                android:id="@+id/filter_done"
+                style="@style/StrideTaskChip"
+                android:text="@string/tasks_done" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/result_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:textSize="12sp"
+        android:textColor="@color/tasks_muted" />
+
+    <ProgressBar
+        android:id="@+id/loading_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/tasks_accent"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/feedback_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:accessibilityLiveRegion="polite"
+        android:textSize="14sp"
+        android:textColor="@color/tasks_muted"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_tasks_card"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="28dp"
+        android:visibility="gone">
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_workspace_tasks"
+            android:tint="@color/tasks_accent" />
+        <TextView
+            android:id="@+id/empty_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:textColor="@color/tasks_ink"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/empty_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:textColor="@color/tasks_muted"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

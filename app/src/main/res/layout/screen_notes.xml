@@ -1,78 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
+    android:background="@color/notes_background"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:paddingStart="18dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="18dp">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_notes_header"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="18dp">
         <LinearLayout
-            android:id="@+id/content_container"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="18dp">
-
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Notes"
-                android:textColor="@color/stride_text"
-                android:textSize="27sp"
+                android:accessibilityHeading="true"
+                android:text="@string/notes_title"
+                android:textColor="@android:color/white"
+                android:textSize="28sp"
                 android:textStyle="bold" />
-
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:text="Capture and organize your thoughts."
-                android:textColor="@color/stride_muted"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/add_button"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_primary_button"
-                android:text="+ New note"
-                android:textColor="@android:color/white" />
-
-            <LinearLayout
-                android:id="@+id/note_editor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_card"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="New note" android:textColor="@color/stride_text" android:textSize="19sp" android:textStyle="bold" />
-                <EditText android:id="@+id/note_title_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:hint="Title" android:inputType="textCapSentences" />
-                <EditText android:id="@+id/note_content_input" android:layout_width="match_parent" android:layout_height="150dp" android:gravity="top" android:hint="Write something worth remembering…" android:inputType="textMultiLine|textCapSentences" />
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="horizontal">
-                    <Button android:id="@+id/cancel_note_button" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:background="@drawable/bg_secondary_button" android:text="Cancel" android:textColor="@color/stride_primary" />
-                    <Button android:id="@+id/save_note_button" android:layout_width="0dp" android:layout_height="48dp" android:layout_marginStart="8dp" android:layout_weight="1" android:background="@drawable/bg_primary_button" android:text="Save note" android:textColor="@android:color/white" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView android:id="@+id/empty_notes" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:gravity="center" android:text="No notes yet. Create one to get started." android:textColor="@color/stride_muted" android:textSize="16sp" />
+                android:layout_marginTop="4dp"
+                android:text="@string/notes_subtitle"
+                android:textColor="@android:color/white"
+                android:textSize="13sp" />
         </LinearLayout>
-    </ScrollView>
+        <Button
+            android:id="@+id/add_button"
+            style="@style/StrideNotesTextButton"
+            android:text="@string/notes_new" />
+    </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list_container"
+    <EditText
+        android:id="@+id/search_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:minHeight="52dp"
+        android:background="@drawable/bg_notes_card"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:hint="@string/notes_search_hint"
+        android:contentDescription="@string/notes_search_hint"
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:singleLine="true"
+        android:textColor="@color/notes_ink"
+        android:textColorHint="@color/notes_muted"
+        android:textSize="15sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:text="@string/notes_recent"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/notes_ink" />
+            <TextView
+                android:id="@+id/result_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:textSize="12sp"
+                android:textColor="@color/notes_muted" />
+        </LinearLayout>
+        <Button
+            android:id="@+id/refresh_button"
+            style="@style/StrideNotesTextButton"
+            android:text="@string/notes_refresh" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginTop="8dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/notes_accent"
+        android:visibility="gone" />
+    <TextView
+        android:id="@+id/feedback_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:accessibilityLiveRegion="polite"
+        android:textSize="13sp"
+        android:textColor="@color/notes_muted"
+        android:visibility="gone" />
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="18dp"
-        android:layout_marginBottom="18dp" />
-
+        android:layout_marginTop="12dp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/notes_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="24dp"
+            android:clipToPadding="false"
+            android:requiresFadingEdge="none"
+            android:scrollbars="vertical" />
+        <ScrollView
+            android:id="@+id/empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="24dp"
+            android:requiresFadingEdge="none"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_notes_card"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="28dp">
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_notes_field"
+                    android:padding="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_workspace_notes"
+                    android:tint="@color/notes_accent" />
+                <TextView
+                    android:id="@+id/empty_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/notes_ink" />
+                <TextView
+                    android:id="@+id/empty_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    android:textSize="14sp"
+                    android:textColor="@color/notes_muted" />
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
 </LinearLayout>
