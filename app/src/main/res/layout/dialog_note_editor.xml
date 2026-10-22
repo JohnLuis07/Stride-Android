@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/close_button"
+            style="@style/StrideNotesTextButton"
+            android:layout_width="48dp"
+            android:minWidth="48dp"
+            android:padding="0dp"
+            android:contentDescription="@string/notes_close"
+            android:text="&#215;"
+            android:textSize="24sp" />
+        <TextView
+            android:id="@+id/editor_status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:accessibilityLiveRegion="polite"
+            android:text="@string/notes_draft"
+            android:textSize="12sp"
+            android:textColor="@color/notes_muted" />
+        <Button
+            android:id="@+id/save_button"
+            style="@style/StrideNotesButton"
+            android:text="@string/notes_save" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/title_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="12dp"
+        android:minHeight="56dp"
+        android:background="@null"
+        android:contentDescription="@string/notes_title_label"
+        android:hint="@string/notes_title_hint"
+        android:inputType="textCapSentences"
+        android:singleLine="true"
+        android:textSize="24sp"
+        android:textColor="@color/notes_ink"
+        android:textColorHint="@color/notes_muted"
+        android:fontFamily="sans-serif-medium" />
+
+    <ProgressBar
+        android:id="@+id/editor_loading"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/notes_accent" />
+
+    <WebView
+        android:id="@+id/content_editor"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:contentDescription="@string/notes_body_label"
+        android:requiresFadingEdge="none" />
+
+    <TextView
+        android:id="@+id/form_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="14dp"
+        android:accessibilityLiveRegion="polite"
+        android:textColor="@color/notes_error"
+        android:textSize="14sp"
+        android:visibility="gone" />
+</LinearLayout>

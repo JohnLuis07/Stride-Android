@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tasks_title">Tasks</string>
+    <string name="tasks_eyebrow">YOUR WORKSPACE</string>
+    <string name="tasks_subtitle">A little progress, every day.</string>
+    <string name="tasks_hero_title">Make room for what matters.</string>
+    <string name="tasks_hero_subtitle">Plan your next step and keep your momentum.</string>
+    <string name="tasks_progress">%1$d of %2$d tasks complete</string>
+    <string name="tasks_progress_percent">%1$d%%</string>
+    <string name="tasks_new">New task</string>
+    <string name="tasks_edit">Edit task</string>
+    <string name="tasks_create">Create task</string>
+    <string name="tasks_update">Save changes</string>
+    <string name="tasks_total">Total tasks</string>
+    <string name="tasks_todo">To Do</string>
+    <string name="tasks_doing">Active</string>
+    <string name="tasks_done">Done</string>
+    <string name="tasks_all">All</string>
+    <string name="tasks_your_tasks">Your tasks</string>
+    <string name="tasks_visible_count">%1$d shown</string>
+    <string name="tasks_refresh">Refresh tasks</string>
+    <string name="tasks_loading">Loading your tasks…</string>
+    <string name="tasks_saving">Saving…</string>
+    <string name="tasks_load_failed">Could not refresh tasks. Your existing tasks are still shown.</string>
+    <string name="tasks_retry">Try again</string>
+    <string name="tasks_empty_title">A fresh start</string>
+    <string name="tasks_empty_message">Add your first task and take the next step.</string>
+    <string name="tasks_filter_empty_title">Nothing here yet</string>
+    <string name="tasks_filter_empty_message">Tasks with this status will appear here. Try another filter or create a task.</string>
+    <string name="tasks_title_label">Task title</string>
+    <string name="tasks_title_hint">What needs to be done?</string>
+    <string name="tasks_details_label">Details · optional</string>
+    <string name="tasks_details_hint">Add context, notes, or next steps</string>
+    <string name="tasks_due_label">Due date · optional</string>
+    <string name="tasks_no_date">No due date</string>
+    <string name="tasks_clear_date">Clear date</string>
+    <string name="tasks_priority_label">Priority</string>
+    <string name="tasks_low">Low</string>
+    <string name="tasks_medium">Medium</string>
+    <string name="tasks_high">High</string>
+    <string name="tasks_due">Due %1$s</string>
+    <string name="tasks_due_today">Due today</string>
+    <string name="tasks_overdue">Overdue · %1$s</string>
+    <string name="tasks_cancel">Cancel</string>
+    <string name="tasks_delete">Delete</string>
+    <string name="tasks_delete_title">Delete task?</string>
+    <string name="tasks_delete_message">“%1$s” will be permanently deleted.</string>
+    <string name="tasks_title_required">Enter a task title</string>
+    <string name="tasks_date_invalid">Choose a valid due date.</string>
+    <string name="tasks_save_failed">Could not save this task. Please try again.</string>
+    <string name="tasks_delete_failed">Could not delete this task. Please refresh and try again.</string>
+    <string name="tasks_status_failed">Could not update the status. Please try again.</string>
+    <string name="tasks_status_description">Set %1$s to %2$s</string>
+    <string name="tasks_menu_description">Actions for %1$s</string>
+    <string-array name="tasks_priorities">
+        <item>@string/tasks_low</item>
+        <item>@string/tasks_medium</item>
+        <item>@string/tasks_high</item>
+    </string-array>
+</resources>

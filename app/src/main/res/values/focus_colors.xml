@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="focus_background">#F5F6FC</color>
+    <color name="focus_surface">#FFFFFF</color>
+    <color name="focus_ink">#24233F</color>
+    <color name="focus_muted">#676B80</color>
+    <color name="focus_border">#E4E6F1</color>
+    <color name="focus_track">#ECECF5</color>
+    <color name="focus_pomodoro">#5145CD</color>
+    <color name="focus_rule52">#936000</color>
+    <color name="focus_flowtime">#7950B8</color>
+    <color name="focus_short">#24745E</color>
+    <color name="focus_long">#3369B0</color>
+    <color name="focus_soft">#EEECFF</color>
+    <color name="focus_success">#24745E</color>
+</resources>

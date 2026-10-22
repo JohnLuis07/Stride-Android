@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notes_title">Notes</string>
+    <string name="notes_subtitle">A home for your ideas.</string>
+    <string name="notes_new">New note</string>
+    <string name="notes_search_hint">Search titles and content</string>
+    <string name="notes_recent">Recent notes</string>
+    <string name="notes_results">%1$d of %2$d notes</string>
+    <string name="notes_refresh">Refresh</string>
+    <string name="notes_retry">Try again</string>
+    <string name="notes_loading">Loading your notes…</string>
+    <string name="notes_load_failed">Could not refresh your notes. Previously loaded notes are still available.</string>
+    <string name="notes_empty_title">Your next idea starts here</string>
+    <string name="notes_empty_message">Capture class notes, meeting takeaways, or a thought worth keeping.</string>
+    <string name="notes_no_results_title">No matching notes</string>
+    <string name="notes_no_results_message">Try a different word or clear your search.</string>
+    <string name="notes_untitled">Untitled Note</string>
+    <string name="notes_no_content">No content yet. Tap to start writing.</string>
+    <string name="notes_image_preview">Contains an image</string>
+    <string name="notes_updated">Updated %1$s</string>
+    <string name="notes_updated_recently">Recently updated</string>
+    <string name="notes_open_description">Open %1$s</string>
+    <string name="notes_actions_description">Actions for %1$s</string>
+    <string name="notes_edit">Edit note</string>
+    <string name="notes_delete">Delete</string>
+    <string name="notes_delete_title">Delete note?</string>
+    <string name="notes_delete_message">“%1$s” will be permanently deleted.</string>
+    <string name="notes_cancel">Cancel</string>
+    <string name="notes_delete_failed">Could not delete this note. Refresh and try again.</string>
+    <string name="notes_title_hint">Give your note a title…</string>
+    <string name="notes_title_label">Note title</string>
+    <string name="notes_body_hint">Start writing your ideas here…</string>
+    <string name="notes_body_label">Note content</string>
+    <string name="notes_save">Save note</string>
+    <string name="notes_saving">Saving…</string>
+    <string name="notes_saved">All changes saved</string>
+    <string name="notes_unsaved">Unsaved changes</string>
+    <string name="notes_draft">New draft</string>
+    <string name="notes_close">Close editor</string>
+    <string name="notes_save_failed">Could not save. Your draft is still here. Please try again.</string>
+    <string name="notes_editor_loading">Opening editor…</string>
+    <string name="notes_editor_failed">Could not open the editor. Close it and try again. Your draft has been kept.</string>
+    <string name="notes_discard_title">Discard your changes?</string>
+    <string name="notes_discard_message">Your latest edits have not been saved.</string>
+    <string name="notes_keep_editing">Keep editing</string>
+    <string name="notes_discard">Discard</string>
+</resources>

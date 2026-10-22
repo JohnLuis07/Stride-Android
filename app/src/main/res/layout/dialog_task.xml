@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="22dp"
+        android:paddingEnd="22dp"
+        android:paddingBottom="18dp">
+
+        <TextView style="@style/StrideTaskLabel" android:labelFor="@id/title_input" android:text="@string/tasks_title_label" />
+        <EditText
+            android:id="@+id/title_input"
+            style="@style/StrideTaskField"
+            android:hint="@string/tasks_title_hint"
+            android:inputType="textCapSentences"
+            android:singleLine="true" />
+
+        <TextView style="@style/StrideTaskLabel" android:labelFor="@id/details_input" android:text="@string/tasks_details_label" />
+        <EditText
+            android:id="@+id/details_input"
+            style="@style/StrideTaskField"
+            android:gravity="top|start"
+            android:hint="@string/tasks_details_hint"
+            android:inputType="textMultiLine|textCapSentences"
+            android:minLines="3"
+            android:maxLines="6" />
+
+        <TextView style="@style/StrideTaskLabel" android:labelFor="@id/due_button" android:text="@string/tasks_due_label" />
+        <Button
+            android:id="@+id/due_button"
+            style="@style/StrideTaskField"
+            android:backgroundTint="@null"
+            android:drawableEnd="@drawable/ic_workspace_calendar"
+            android:drawableTint="@color/tasks_accent"
+            android:gravity="center_vertical|start"
+            android:textAllCaps="false"
+            android:text="@string/tasks_no_date" />
+        <Button
+            android:id="@+id/clear_date_button"
+            style="@style/StrideTaskChip"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:text="@string/tasks_clear_date" />
+
+        <TextView style="@style/StrideTaskLabel" android:labelFor="@id/priority_spinner" android:text="@string/tasks_priority_label" />
+        <Spinner
+            android:id="@+id/priority_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="52dp"
+            android:spinnerMode="dropdown" />
+
+        <TextView
+            android:id="@+id/form_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:accessibilityLiveRegion="polite"
+            android:textColor="@color/tasks_high"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

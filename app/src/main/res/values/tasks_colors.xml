@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tasks_background">#F5F6FC</color>
+    <color name="tasks_ink">#222342</color>
+    <color name="tasks_muted">#666A80</color>
+    <color name="tasks_accent">#4F46C8</color>
+    <color name="tasks_accent_end">#7465E6</color>
+    <color name="tasks_accent_soft">#EEECFF</color>
+    <color name="tasks_border">#E5E7F2</color>
+    <color name="tasks_high">#B53345</color>
+    <color name="tasks_high_soft">#FDECF0</color>
+    <color name="tasks_medium">#895300</color>
+    <color name="tasks_medium_soft">#FFF4DC</color>
+    <color name="tasks_low">#286154</color>
+    <color name="tasks_low_soft">#E6F5EF</color>
+    <color name="tasks_hero_text">#F0EDFF</color>
+</resources>
