@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-stride-notes-editor'; style-src 'unsafe-inline'; img-src https: data:; connect-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; color: #242440; background: white; font: 16px/1.65 system-ui, sans-serif; }
+#toolbar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px; background: #f5f6fc; border-top: 1px solid #e3e5f0; border-bottom: 1px solid #e3e5f0; }
+button, select, input { font: inherit; }
+#toolbar button, #toolbar select, .color-control { min-width: 44px; min-height: 44px; border: 1px solid #e3e5f0; border-radius: 9px; background: white; color: #363255; padding: 6px 10px; }
+#toolbar button { font-size: 16px; cursor: pointer; }
+#toolbar button[aria-pressed="true"] { background: #eeecff; color: #5145cd; border-color: #5145cd; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid #5145cd; outline-offset: 2px; }
+.color-control { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; }
+input[type="color"] { width: 26px; height: 28px; border: 0; padding: 0; background: transparent; }
+#editor { min-height: 55vh; padding: 20px 22px 48px; overflow-wrap: anywhere; outline: none; white-space: pre-wrap; }
+#editor:empty::before { content: attr(data-placeholder); color: #676b80; pointer-events: none; }
+#editor p { margin: 0 0 12px; }
+#editor h1, #editor h2, #editor h3 { line-height: 1.3; margin: 18px 0 12px; }
+#editor img { max-width: 100%; height: auto; border-radius: 8px; }
+#editor a { color: #5145cd; text-decoration: underline; }
+#editor blockquote { margin: 12px 0; padding-left: 16px; border-left: 3px solid #7768e6; color: #676b80; }
+#editor pre { white-space: pre-wrap; background: #f5f6fc; padding: 12px; border-radius: 8px; }
+.ql-align-center { text-align: center; } .ql-align-right { text-align: right; } .ql-align-justify { text-align: justify; }
+.ql-direction-rtl { direction: rtl; }
+.ql-indent-1 { padding-left: 2em; } .ql-indent-2 { padding-left: 4em; } .ql-indent-3 { padding-left: 6em; }
+.ql-indent-4 { padding-left: 8em; } .ql-indent-5 { padding-left: 10em; } .ql-indent-6 { padding-left: 12em; }
+.ql-indent-7 { padding-left: 14em; } .ql-indent-8 { padding-left: 16em; }
+li[data-list="bullet"] { list-style-type: disc; }
+li[data-list="checked"] { list-style-type: '\2611  '; } li[data-list="unchecked"] { list-style-type: '\2610  '; }
+dialog { width: min(92vw, 440px); border: 1px solid #e3e5f0; border-radius: 18px; padding: 22px; color: #242440; }
+dialog::backdrop { background: #22234266; }
+dialog h2 { margin: 0 0 12px; font-size: 20px; }
+dialog input { width: 100%; min-height: 48px; border: 1px solid #e3e5f0; border-radius: 10px; padding: 10px; margin-top: 6px; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.dialog-actions button { min-height: 44px; padding: 8px 16px; border: 0; border-radius: 10px; color: #5145cd; background: #eeecff; }
+.dialog-actions button:last-child { color: white; background: #5145cd; }
+#url-error { color: #b53345; font-size: 13px; }
+button:disabled, select:disabled, input:disabled { opacity: .5; }
+</style>
+</head>
+<body>
+<div id="toolbar" role="toolbar" aria-label="Text formatting">
+    <select id="heading" aria-label="Paragraph style">
+        <option value="p">Body</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="h3">Heading 3</option>
+    </select>
+    <select id="size" aria-label="Font size">
+        <option value="10">10</option><option value="12">12</option><option value="14">14</option><option value="16" selected>16</option><option value="18">18</option><option value="20">20</option><option value="24">24</option><option value="32">32</option><option value="48">48</option><option value="64">64</option>
+    </select>
+    <button type="button" data-command="bold" aria-label="Bold" aria-pressed="false"><b>B</b></button>
+    <button type="button" data-command="italic" aria-label="Italic" aria-pressed="false"><i>I</i></button>
+    <button type="button" data-command="underline" aria-label="Underline" aria-pressed="false"><u>U</u></button>
+    <button type="button" data-command="strikeThrough" aria-label="Strikethrough" aria-pressed="false"><s>S</s></button>
+    <button type="button" data-command="insertOrderedList" aria-label="Numbered list">1.</button>
+    <button type="button" data-command="insertUnorderedList" aria-label="Bullet list">&#8226;</button>
+    <label class="color-control">Text <input id="text-color" type="color" value="#242440" aria-label="Text color"></label>
+    <label class="color-control">Highlight <input id="highlight-color" type="color" value="#fff1b8" aria-label="Highlight color"></label>
+    <button type="button" id="link-button" aria-label="Insert link">Link</button>
+    <button type="button" id="image-button" aria-label="Insert image from URL">Image</button>
+    <button type="button" data-command="removeFormat" aria-label="Clear text formatting">Clear</button>
+</div>
+<div id="editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note content" data-placeholder="Start writing your ideas here…"></div>
+<dialog id="url-dialog" aria-labelledby="url-title">
+    <h2 id="url-title">Insert link</h2>
+    <label for="url-input">URL</label>
+    <input id="url-input" type="url" autocomplete="off" placeholder="https://">
+    <p id="url-error" role="alert" hidden></p>
+    <div class="dialog-actions"><button type="button" id="url-cancel">Cancel</button><button type="button" id="url-insert">Insert</button></div>
+</dialog>
+<script nonce="stride-notes-editor">
+(() => {
+    'use strict';
+    const editor = document.getElementById('editor');
+    const toolbar = document.getElementById('toolbar');
+    const urlDialog = document.getElementById('url-dialog');
+    const urlInput = document.getElementById('url-input');
+    const urlError = document.getElementById('url-error');
+    const allowed = new Set(['P','DIV','BR','SPAN','B','STRONG','I','EM','U','S','STRIKE','H1','H2','H3','H4','H5','H6','UL','OL','LI','A','IMG','BLOCKQUOTE','PRE','CODE','SUB','SUP','FONT']);
+    const discarded = new Set(['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','SVG','MATH','FORM','INPUT','BUTTON','SELECT','TEXTAREA','LINK','META','BASE','VIDEO','AUDIO','SOURCE']);
+    const styles = ['color','background-color','font-size','font-weight','font-style','text-decoration','text-align','direction','padding-left'];
+    let range = null;
+    let original = '';
+    let baseline = '';
+    let enabled = true;
+    let insertingImage = false;
+
+    function safeUrl(value, image) {
+        if (image && /^data:image\/(png|jpe?g|gif|webp);base64,[a-z0-9+/=\s]+$/i.test(value)) return value;
+        try {
+            const url = new URL(value);
+            const valid = image ? url.protocol === 'https:' : ['https:', 'http:', 'mailto:'].includes(url.protocol);
+            return valid ? url.href : '';
+        } catch (_) { return ''; }
+    }
+
+    function sanitize(html) {
+        const source = new DOMParser().parseFromString(html, 'text/html');
+        function clean(parent) {
+            [...parent.childNodes].forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) return;
+                if (node.nodeType !== Node.ELEMENT_NODE) { node.remove(); return; }
+                if (discarded.has(node.tagName)) { node.remove(); return; }
+                clean(node);
+                if (!allowed.has(node.tagName)) { node.replaceWith(...node.childNodes); return; }
+                const cleanStyle = document.createElement('span').style;
+                styles.forEach(property => {
+                    const value = node.style.getPropertyValue(property);
+                    if (value && !/url\s*\(|expression|@|var\s*\(/i.test(value)) cleanStyle.setProperty(property, value);
+                });
+                if (node.tagName === 'FONT') {
+                    if (node.getAttribute('color')) cleanStyle.color = node.getAttribute('color');
+                    if (node.getAttribute('size')) {
+                        const sizes = {1:10,2:12,3:16,4:18,5:24,6:32,7:48};
+                        const size = sizes[node.getAttribute('size')];
+                        if (size) cleanStyle.fontSize = size + 'px';
+                    }
+                }
+                const classes = [...node.classList].filter(value => /^ql-(align-(center|right|justify)|direction-rtl|indent-[1-8])$/.test(value));
+                const href = node.tagName === 'A' ? safeUrl(node.getAttribute('href') || '', false) : '';
+                const src = node.tagName === 'IMG' ? safeUrl(node.getAttribute('src') || '', true) : '';
+                const alt = node.getAttribute('alt') || '';
+                const list = node.tagName === 'LI' ? node.getAttribute('data-list') : '';
+                [...node.attributes].forEach(attribute => node.removeAttribute(attribute.name));
+                if (classes.length) node.className = classes.join(' ');
+                if (cleanStyle.cssText) node.setAttribute('style', cleanStyle.cssText);
+                if (href) node.setAttribute('href', href);
+                if (node.tagName === 'IMG') {
+                    if (!src) { node.remove(); return; }
+                    node.setAttribute('src', src);
+                    node.setAttribute('alt', alt || 'Embedded image');
+                }
+                if (['bullet','ordered','checked','unchecked'].includes(list)) node.setAttribute('data-list', list);
+                if (node.tagName === 'FONT') {
+                    const span = source.createElement('span');
+                    span.setAttribute('style', cleanStyle.cssText);
+                    span.append(...node.childNodes);
+                    node.replaceWith(span);
+                }
+            });
+        }
+        clean(source.body);
+        return source.body.innerHTML;
+    }
+
+    function escapeText(text) {
+        const span = document.createElement('span');
+        span.textContent = text;
+        return span.innerHTML.replace(/\r?\n/g, '<br>');
+    }
+
+    function rememberSelection() {
+        const selection = window.getSelection();
+        if (selection.rangeCount && editor.contains(selection.anchorNode) && editor.contains(selection.focusNode)) {
+            range = selection.getRangeAt(0).cloneRange();
+        }
+        toolbar.querySelectorAll('[aria-pressed]').forEach(button => {
+            button.setAttribute('aria-pressed', String(document.queryCommandState(button.dataset.command)));
+        });
+    }
+
+    function restoreSelection() {
+        editor.focus();
+        if (range && editor.contains(range.commonAncestorContainer)) {
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
+
+    function read() {
+        if (editor.innerHTML === baseline) return original;
+        if (!editor.textContent.trim() && !editor.querySelector('img')) return '';
+        return sanitize(editor.innerHTML);
+    }
+
+    function changed() {
+        rememberSelection();
+        if (enabled && window.NotesBridge) window.NotesBridge.changed(read());
+    }
+
+    function command(name, value) {
+        if (!enabled) return;
+        restoreSelection();
+        document.execCommand(name, false, value || null);
+        changed();
+    }
+
+    toolbar.addEventListener('pointerdown', event => {
+        if (event.target.closest('button')) event.preventDefault();
+    });
+    toolbar.querySelectorAll('[data-command]').forEach(button => button.addEventListener('click', () => command(button.dataset.command)));
+    document.getElementById('heading').addEventListener('change', event => command('formatBlock', event.target.value));
+    document.getElementById('size').addEventListener('change', event => {
+        if (!enabled) return;
+        restoreSelection();
+        document.execCommand('fontSize', false, '7');
+        editor.querySelectorAll('font[size="7"]').forEach(font => {
+            font.removeAttribute('size');
+            font.style.fontSize = event.target.value + 'px';
+        });
+        changed();
+    });
+    document.getElementById('text-color').addEventListener('input', event => command('foreColor', event.target.value));
+    document.getElementById('highlight-color').addEventListener('input', event => command('hiliteColor', event.target.value));
+    document.addEventListener('selectionchange', rememberSelection);
+    editor.addEventListener('input', changed);
+    editor.addEventListener('click', event => { if (event.target.closest('a')) event.preventDefault(); });
+    editor.addEventListener('drop', event => event.preventDefault());
+    editor.addEventListener('paste', event => {
+        event.preventDefault();
+        if (!enabled || !event.clipboardData) return;
+        const html = event.clipboardData.getData('text/html');
+        const text = event.clipboardData.getData('text/plain');
+        command('insertHTML', html ? sanitize(html) : escapeText(text));
+    });
+
+    function showUrlDialog(image) {
+        if (!enabled) return;
+        rememberSelection();
+        insertingImage = image;
+        document.getElementById('url-title').textContent = image ? 'Insert image' : 'Insert link';
+        urlInput.value = '';
+        urlInput.placeholder = image ? 'https://example.com/image.png' : 'https://';
+        urlError.hidden = true;
+        urlDialog.showModal();
+        urlInput.focus();
+    }
+    document.getElementById('link-button').addEventListener('click', () => showUrlDialog(false));
+    document.getElementById('image-button').addEventListener('click', () => showUrlDialog(true));
+    document.getElementById('url-cancel').addEventListener('click', () => urlDialog.close());
+    document.getElementById('url-insert').addEventListener('click', () => {
+        const url = safeUrl(urlInput.value.trim(), insertingImage);
+        if (!url) {
+            urlError.textContent = insertingImage ? 'Enter an HTTPS image URL.' : 'Enter an HTTP, HTTPS, or email link.';
+            urlError.hidden = false;
+            return;
+        }
+        urlDialog.close();
+        restoreSelection();
+        if (insertingImage) {
+            command('insertImage', url);
+        } else {
+            const selection = window.getSelection();
+            if (selection.isCollapsed) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.textContent = url;
+                command('insertHTML', link.outerHTML);
+            } else {
+                command('createLink', url);
+            }
+        }
+    });
+
+    window.notesEditor = {
+        load(content, placeholder) {
+            original = content || '';
+            const rich = /<\s*\/?\s*(p|div|h[1-6]|br|span|strong|b|i|em|u|s|strike|font|code|sub|sup|ol|ul|li|a|img|blockquote|pre)(\s|\/?>)/i.test(original);
+            editor.innerHTML = rich ? sanitize(original) : escapeText(original);
+            editor.dataset.placeholder = placeholder;
+            baseline = editor.innerHTML;
+            range = null;
+        },
+        read,
+        markSaved(content) {
+            original = content;
+            baseline = editor.innerHTML;
+        },
+        setEnabled(value) {
+            if (enabled === value) return;
+            enabled = value;
+            editor.contentEditable = String(value);
+            toolbar.querySelectorAll('button,select,input').forEach(control => control.disabled = !value);
+        }
+    };
+})();
+</script>
+</body>
+</html>
