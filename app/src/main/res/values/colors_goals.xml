@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="goals_background">#F5F6FC</color>
+    <color name="goals_surface">#FFFFFF</color>
+    <color name="goals_ink">#202342</color>
+    <color name="goals_muted">#666C85</color>
+    <color name="goals_accent">#5546D9</color>
+    <color name="goals_soft">#EEEBFF</color>
+    <color name="goals_border">#E3E5F0</color>
+    <color name="goals_success">#13785B</color>
+    <color name="goals_success_soft">#E5F5ED</color>
+    <color name="goals_warning">#A23E35</color>
+</resources>
