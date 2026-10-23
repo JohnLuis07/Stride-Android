@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:background="@drawable/bg_goals_card"
+    android:orientation="vertical"
+    android:padding="18dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="top"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/goal_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/goals_ink"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:accessibilityHeading="true" />
+        <ImageButton
+            android:id="@+id/actions_button"
+            style="@style/StrideGoalButton"
+            android:layout_width="48dp"
+            android:minWidth="48dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:src="@drawable/ic_goals_more" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/goal_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/goals_accent"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/goal_deadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/goals_muted"
+        android:textSize="13sp" />
+    <TextView
+        android:id="@+id/goal_notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:textColor="@color/goals_muted"
+        android:textSize="14sp"
+        android:lineSpacingExtra="3dp" />
+    <ProgressBar
+        android:id="@+id/goal_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_marginTop="18dp"
+        android:max="100"
+        android:progressDrawable="@drawable/bg_goals_progress" />
+    <TextView
+        android:id="@+id/progress_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/goals_accent"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/completed_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_goals_field"
+        android:backgroundTint="@color/goals_success_soft"
+        android:padding="8dp"
+        android:text="@string/goals_done_badge"
+        android:textColor="@color/goals_success"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/decrease_button"
+            style="@style/StrideGoalButton"
+            android:layout_width="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/goals_minus" />
+        <Button
+            android:id="@+id/progress_button"
+            style="@style/StrideGoalButton"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/goals_set_progress" />
+        <Button
+            android:id="@+id/increase_button"
+            style="@style/StrideGoalPrimary"
+            android:layout_width="0dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/goals_plus" />
+    </LinearLayout>
+</LinearLayout>

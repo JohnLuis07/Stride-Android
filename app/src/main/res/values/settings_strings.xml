@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_eyebrow">YOUR WORKSPACE</string>
+    <string name="settings_title">Profile &amp; settings</string>
+    <string name="settings_subtitle">A workspace that feels like you.</string>
+    <string name="settings_profile_label">PERSONAL PROFILE</string>
+    <string name="settings_member">Stride member</string>
+    <string name="settings_edit">Edit profile</string>
+    <string name="settings_profile_hint">Keep your account details up to date.</string>
+    <string name="settings_name">Full name</string>
+    <string name="settings_email">Email address</string>
+    <string name="settings_cancel">Cancel</string>
+    <string name="settings_save_profile">Save profile</string>
+    <string name="settings_save_features">Save preferences</string>
+    <string name="settings_saving">Saving…</string>
+    <string name="settings_name_required">Enter your full name</string>
+    <string name="settings_email_invalid">Enter a valid email address</string>
+    <string name="settings_profile_saved">Profile updated</string>
+    <string name="settings_profile_error">Could not save your profile. Please try again.</string>
+    <string name="settings_features_title">Make room for what matters</string>
+    <string name="settings_features_hint">Choose the tools you want on your dashboard.</string>
+    <string name="settings_features_label">DASHBOARD PREFERENCES</string>
+    <string name="settings_customize">Customize tools</string>
+    <string name="settings_feature_count">%1$d of %2$d tools selected</string>
+    <string name="settings_features_saved">Dashboard preferences updated</string>
+    <string name="settings_features_error">Could not save preferences. Please try again.</string>
+    <string name="settings_notes">Notes</string>
+    <string name="settings_notes_hint">Capture ideas and keep them close.</string>
+    <string name="settings_calendar">Calendar</string>
+    <string name="settings_calendar_hint">Plan your days with a clear view.</string>
+    <string name="settings_tasks">Tasks</string>
+    <string name="settings_tasks_hint">Turn your next steps into progress.</string>
+    <string name="settings_goals">Goals</string>
+    <string name="settings_goals_hint">Stay connected to the bigger picture.</string>
+    <string name="settings_focus">Focus</string>
+    <string name="settings_focus_hint">Create space for uninterrupted work.</string>
+    <string name="settings_account">ACCOUNT</string>
+    <string name="settings_sign_out">Sign out</string>
+    <string name="settings_sign_out_hint">Sign out of Stride on this device.</string>
+    <string name="settings_sign_out_title">Sign out of Stride?</string>
+    <string name="settings_sign_out_message">You will need to sign in again to access your workspace.</string>
+</resources>
