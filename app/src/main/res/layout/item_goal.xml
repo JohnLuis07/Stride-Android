@@ -46,6 +46,14 @@
         android:textColor="@color/goals_muted"
         android:textSize="13sp" />
     <TextView
+        android:id="@+id/goal_timing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/goals_muted"
+        android:textSize="13sp"
+        android:visibility="gone" />
+    <TextView
         android:id="@+id/goal_notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

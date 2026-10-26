@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="StrideNoteAiTab" parent="StrideNotesTextButton">
+        <item name="android:background">@drawable/bg_note_ai_tab</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+</resources>

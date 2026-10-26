@@ -52,7 +52,39 @@
         android:textSize="13sp"
         tools:text="Review priorities and decide the next steps." />
 
+    <TextView
+        android:id="@+id/event_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="13sp"
+        android:visibility="gone"
+        tools:text="On track"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/event_timing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/workspace_secondary"
+        android:textSize="13sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/event_source_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/workspace_secondary"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="Manage this deadline in Tasks."
+        tools:visibility="visible" />
+
     <LinearLayout
+        android:id="@+id/event_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

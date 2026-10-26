@@ -65,6 +65,15 @@
         android:textColor="@color/tasks_muted"
         android:textSize="12sp" />
 
+    <TextView
+        android:id="@+id/task_timing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/tasks_muted"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

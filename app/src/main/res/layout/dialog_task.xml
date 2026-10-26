@@ -45,6 +45,21 @@
             android:layout_marginTop="8dp"
             android:text="@string/tasks_clear_date" />
 
+        <TextView style="@style/StrideTaskLabel" android:labelFor="@id/time_button" android:text="@string/tasks_time_label" />
+        <Button
+            android:id="@+id/time_button"
+            style="@style/StrideTaskField"
+            android:backgroundTint="@null"
+            android:gravity="center_vertical|start"
+            android:textAllCaps="false"
+            android:text="@string/tasks_time_choose_date" />
+        <Button
+            android:id="@+id/clear_time_button"
+            style="@style/StrideTaskChip"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:text="@string/tasks_clear_time" />
+
         <TextView style="@style/StrideTaskLabel" android:labelFor="@id/priority_spinner" android:text="@string/tasks_priority_label" />
         <Spinner
             android:id="@+id/priority_spinner"

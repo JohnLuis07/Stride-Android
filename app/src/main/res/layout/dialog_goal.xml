@@ -65,6 +65,23 @@
             android:layout_marginTop="8dp"
             android:text="@string/goals_clear_date" />
         <TextView
+            style="@style/StrideGoalLabel"
+            android:labelFor="@id/time_button"
+            android:text="@string/goals_time_label" />
+        <Button
+            android:id="@+id/time_button"
+            style="@style/StrideGoalField"
+            android:backgroundTint="@null"
+            android:gravity="center_vertical|start"
+            android:textAllCaps="false"
+            android:text="@string/goals_time_choose_date" />
+        <Button
+            android:id="@+id/clear_time_button"
+            style="@style/StrideGoalButton"
+            android:layout_gravity="end"
+            android:layout_marginTop="8dp"
+            android:text="@string/goals_clear_time" />
+        <TextView
             android:id="@+id/form_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

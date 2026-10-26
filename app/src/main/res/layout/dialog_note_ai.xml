@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/notes_background">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@android:color/white">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <Button
+                android:id="@+id/close_button"
+                style="@style/StrideNotesTextButton"
+                android:text="@string/note_ai_close" />
+            <TextView
+                android:id="@+id/notebook_title"
+                android:layout_height="wrap_content"
+                android:textColor="@color/notes_ink"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:padding="12dp"
+                android:textSize="19sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+            <Button
+                android:id="@+id/edit_button"
+                style="@style/StrideNotesTextButton"
+                android:text="@string/note_ai_edit" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/selection_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:paddingTop="8dp"
+            android:textColor="@color/notes_accent" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <Button
+            android:id="@+id/sources_tab"
+            style="@style/StrideNoteAiTab"
+            android:text="@string/note_ai_sources"
+            android:layout_width="0dp"
+            android:layout_weight="1" />
+        <Button
+            android:id="@+id/chat_tab"
+            style="@style/StrideNoteAiTab"
+            android:text="@string/note_ai_chat"
+            android:layout_width="0dp"
+            android:layout_weight="1" />
+        <Button
+            android:id="@+id/study_tab"
+            style="@style/StrideNoteAiTab"
+            android:text="@string/note_ai_study"
+            android:layout_width="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/notes_accent"
+        android:visibility="gone" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/feedback"
+            android:layout_height="wrap_content"
+            android:textColor="@color/notes_ink"
+            android:textSize="14sp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:padding="12dp"
+            android:accessibilityLiveRegion="polite" />
+        <Button
+            android:id="@+id/refresh_button"
+            style="@style/StrideNotesTextButton"
+            android:text="@string/notes_refresh" />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+        <LinearLayout
+            android:id="@+id/sources_panel"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="@string/note_ai_source_hint"
+                android:textColor="@color/notes_muted"
+                android:paddingBottom="12dp" />
+            <Button
+                android:id="@+id/attach_button"
+                style="@style/StrideNotesTextButton"
+                android:text="@string/note_ai_attach" />
+            <TextView
+                android:id="@+id/sources_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/notes_ink"
+                android:textSize="14sp"
+                android:text="@string/note_ai_empty_sources"
+                android:padding="20dp"
+                android:gravity="center" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/sources_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/chat_panel"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            <TextView
+                android:id="@+id/chat_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="@string/note_ai_empty_chat"
+                android:padding="20dp"
+                android:textColor="@color/notes_muted" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chat_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/note_ai_grounding"
+                android:textSize="11sp"
+                android:textColor="@color/notes_muted"
+                android:paddingBottom="8dp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <EditText
+                    android:id="@+id/question_input"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:minHeight="52dp"
+                    android:maxHeight="140dp"
+                    android:background="@drawable/bg_notes_card"
+                    android:hint="@string/note_ai_question"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="3000"
+                    android:padding="12dp"
+                    android:textColor="@color/notes_ink"
+                    android:textSize="14sp" />
+                <Button
+                    android:id="@+id/send_button"
+                    style="@style/StrideNotesTextButton"
+                    android:text="@string/note_ai_send" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/study_panel"
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/summary_button"
+                    style="@style/StrideNotesTextButton"
+                    android:text="@string/note_ai_summary"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+                <Button
+                    android:id="@+id/guide_button"
+                    style="@style/StrideNotesTextButton"
+                    android:text="@string/note_ai_guide"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <Button
+                    android:id="@+id/cards_button"
+                    style="@style/StrideNotesTextButton"
+                    android:text="@string/note_ai_flashcards"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+                <Button
+                    android:id="@+id/quiz_button"
+                    style="@style/StrideNotesTextButton"
+                    android:text="@string/note_ai_quiz"
+                    android:layout_width="0dp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/study_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:text="@string/note_ai_empty_study"
+                android:padding="20dp"
+                android:textColor="@color/notes_muted" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/artifacts_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

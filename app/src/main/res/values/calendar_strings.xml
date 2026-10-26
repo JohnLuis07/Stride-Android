@@ -3,7 +3,7 @@
     <string name="calendar_previous_month">Previous month</string>
     <string name="calendar_next_month">Next month</string>
     <string name="calendar_today">Today</string>
-    <string name="calendar_hint">Select a day to see its agenda.</string>
+    <string name="calendar_hint">Red: overdue. Green: on track or completed. Select a day to see its agenda.</string>
     <string name="calendar_new_event">New event</string>
     <string name="calendar_edit_event">Edit event</string>
     <string name="calendar_save_event">Add to calendar</string>
@@ -26,6 +26,9 @@
     <string name="calendar_time_until">Until %1$s</string>
     <string name="calendar_day_description">%1$s. %2$s</string>
     <string name="calendar_today_description">%1$s, today. %2$s</string>
+    <string name="calendar_day_status_description">%1$s. %2$s</string>
+    <string name="calendar_day_overdue_description">Contains overdue tasks or goals.</string>
+    <string name="calendar_day_ok_description">Tasks and goals are on track or completed.</string>
     <string name="calendar_edit_description">Edit %1$s</string>
     <string name="calendar_delete_description">Delete %1$s</string>
     <string name="calendar_title_label">Event title</string>
@@ -45,6 +48,40 @@
     <string name="calendar_category_meeting">Meeting</string>
     <string name="calendar_category_personal">Personal</string>
     <string name="calendar_category_deadline">Deadline</string>
+    <string name="calendar_category_task">Task deadline</string>
+    <string name="calendar_category_goal">Goal deadline</string>
+    <string name="calendar_status_overdue">Overdue</string>
+    <string name="calendar_status_on_track">On track</string>
+    <string name="calendar_status_completed">Completed</string>
+    <string name="calendar_status_date">%1$s · %2$s</string>
+    <string name="calendar_deadline_date">All day · Due %1$s</string>
+    <string name="calendar_deadline_time">Due %1$s at %2$s</string>
+    <string name="calendar_date_time">%1$s at %2$s</string>
+    <string name="calendar_due_today_time">Due today at %1$s</string>
+    <string name="calendar_task_source_hint">Manage this deadline in Tasks.</string>
+    <string name="calendar_goal_source_hint">Manage this deadline in Goals.</string>
+    <string name="calendar_timing_remaining">%1$s remaining</string>
+    <string name="calendar_timing_overdue">Overdue by %1$s</string>
+    <string name="calendar_timing_finished_early">Finished %1$s early</string>
+    <string name="calendar_timing_finished_late">Finished %1$s late</string>
+    <string name="calendar_timing_finished_on_time">Finished on time</string>
+    <string name="calendar_timing_completion_unknown">Completion time unavailable</string>
+    <string name="calendar_timing_completion_deadline_unknown">No deadline recorded at completion</string>
+    <string name="calendar_timing_original_deadline">%1$s (deadline at completion)</string>
+    <string name="calendar_timing_unavailable">Deadline timing unavailable</string>
+    <string name="calendar_timing_less_than_minute">less than a minute</string>
+    <plurals name="calendar_duration_days">
+        <item quantity="one">%1$s day</item>
+        <item quantity="other">%1$s days</item>
+    </plurals>
+    <plurals name="calendar_duration_hours">
+        <item quantity="one">%1$s hour</item>
+        <item quantity="other">%1$s hours</item>
+    </plurals>
+    <plurals name="calendar_duration_minutes">
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
+    </plurals>
     <plurals name="calendar_event_count">
         <item quantity="one">%d event</item>
         <item quantity="other">%d events</item>

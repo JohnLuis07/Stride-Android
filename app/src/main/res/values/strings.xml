@@ -2,4 +2,17 @@
 <resources>
     <string name="app_name">Stride</string>
     <string name="stride_logo">Stride logo</string>
+    <string name="google_continue">Continue with Google</string>
+    <string name="google_signing_in">Signing in...</string>
+    <string name="google_auth_divider">or</string>
+    <string name="google_not_configured">Google sign-in is not configured yet. Please contact your administrator.</string>
+    <string name="google_sign_in_failed">Could not sign in with Google. Check your connection and try again.</string>
+    <string name="google_no_account">Add a Google account to your device or choose another sign-in method.</string>
+    <string name="google_provider_unavailable">Google sign-in is unavailable. Update Google Play services or use email and password.</string>
+    <string name="google_backend_not_configured">Google sign-in needs to be enabled in Supabase. Please contact your administrator.</string>
+    <string name="google_profile_setup_required">Google profile setup is incomplete. Please contact your administrator.</string>
+    <string name="google_account_link_required">An existing Stride account uses this email. Sign in with your password, then contact your administrator to link Google to that account.</string>
+    <string name="google_session_expired">Your session expired. Please sign in again.</string>
+    <string name="google_session_storage_failed">Could not securely save your session. Please try signing in again.</string>
+    <string name="google_email_managed">Your Google account manages your email address. Keep that email when saving your profile.</string>
 </resources>

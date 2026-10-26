@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+        <TextView android:id="@+id/instructions" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textColor="@color/auth_muted" android:textSize="14sp" />
+        <EditText android:id="@+id/email_input" style="@style/StrideAuthInput"
+            android:hint="@string/auth_email_hint" android:contentDescription="@string/auth_email_label"
+            android:inputType="textEmailAddress" android:singleLine="true" />
+        <EditText android:id="@+id/code_input" style="@style/StrideAuthInput"
+            android:hint="@string/auth_code_label" android:contentDescription="@string/auth_code_label"
+            android:inputType="number" android:maxLength="10" android:singleLine="true" />
+        <EditText android:id="@+id/password_input" style="@style/StrideAuthInput"
+            android:hint="@string/auth_new_password_hint" android:contentDescription="@string/auth_new_password_hint"
+            android:inputType="textPassword" android:singleLine="true" android:visibility="gone" />
+        <EditText android:id="@+id/confirm_input" style="@style/StrideAuthInput"
+            android:hint="@string/auth_confirm_hint" android:contentDescription="@string/auth_confirm_label"
+            android:inputType="textPassword" android:singleLine="true" android:visibility="gone" />
+        <Button android:id="@+id/resend_button" style="@style/StrideAuthSecondaryButton" android:text="@string/auth_resend_code" />
+        <TextView android:id="@+id/error_text" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:accessibilityLiveRegion="polite" android:textColor="@color/notes_error" android:textSize="13sp"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

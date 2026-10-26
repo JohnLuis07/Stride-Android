@@ -6,4 +6,10 @@
     <color name="calendar_meeting">#356DB0</color>
     <color name="calendar_personal">#28765D</color>
     <color name="calendar_deadline">#AC4551</color>
+    <color name="calendar_status_overdue">#B53345</color>
+    <color name="calendar_status_ok">#13785B</color>
+    <color name="calendar_overdue_soft">#FDECF0</color>
+    <color name="calendar_ok_soft">#E5F5ED</color>
+    <color name="calendar_overdue_ripple">#28B53345</color>
+    <color name="calendar_ok_ripple">#2813785B</color>
 </resources>

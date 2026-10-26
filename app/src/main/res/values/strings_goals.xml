@@ -38,6 +38,12 @@
     <string name="goals_date_label">Target date (optional)</string>
     <string name="goals_no_date">No deadline</string>
     <string name="goals_clear_date">Clear date</string>
+    <string name="goals_time_label">Target time (optional)</string>
+    <string name="goals_time_choose_date">Choose a target date first</string>
+    <string name="goals_time_end_of_day">End of day</string>
+    <string name="goals_clear_time">Clear time</string>
+    <string name="goals_time_invalid">Choose a valid deadline date and time.</string>
+    <string name="goals_setup_required">Goal setup is incomplete. Please contact your administrator.</string>
     <string name="goals_title_required">Enter a goal title.</string>
     <string name="goals_target_invalid">Enter a finite number greater than zero.</string>
     <string name="goals_progress_invalid">Enter a finite number of zero or greater.</string>

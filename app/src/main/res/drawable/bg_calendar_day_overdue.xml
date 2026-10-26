@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/calendar_overdue_ripple">
+    <item>
+        <selector>
+            <item android:state_selected="true" android:state_activated="true">
+                <shape>
+                    <solid android:color="@color/calendar_status_overdue" />
+                    <stroke android:width="2dp" android:color="@android:color/white" />
+                    <corners android:radius="12dp" />
+                </shape>
+            </item>
+            <item android:state_selected="true">
+                <shape>
+                    <solid android:color="@color/calendar_status_overdue" />
+                    <corners android:radius="12dp" />
+                </shape>
+            </item>
+            <item android:state_activated="true">
+                <shape>
+                    <solid android:color="@color/calendar_overdue_soft" />
+                    <stroke android:width="1dp" android:color="@color/calendar_status_overdue" />
+                    <corners android:radius="12dp" />
+                </shape>
+            </item>
+            <item>
+                <shape>
+                    <solid android:color="@color/calendar_overdue_soft" />
+                    <corners android:radius="12dp" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

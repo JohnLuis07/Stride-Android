@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/bg_notes_card"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <CheckBox
+            android:id="@+id/selected"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:buttonTint="@color/notes_accent" />
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1">
+            <TextView
+                android:id="@+id/source_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/notes_ink"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+            <TextView
+                android:id="@+id/source_meta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/notes_muted"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/source_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/notes_ink"
+        android:textSize="14sp"
+        android:paddingTop="8dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        <Button
+            android:id="@+id/preview_button"
+            style="@style/StrideNotesTextButton"
+            android:text="@string/note_ai_preview" />
+        <Button
+            android:id="@+id/remove_button"
+            style="@style/StrideNotesTextButton"
+            android:text="@string/note_ai_remove" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/retry_button"
+        style="@style/StrideNotesTextButton"
+        android:layout_width="match_parent"
+        android:text="@string/note_ai_retry" />
+</LinearLayout>

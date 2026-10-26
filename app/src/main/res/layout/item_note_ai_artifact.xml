@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/bg_notes_card"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+    <TextView
+        android:id="@+id/artifact_kind"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/notes_accent"
+        android:textSize="12sp" />
+    <TextView
+        android:id="@+id/artifact_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/notes_ink"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:paddingTop="8dp" />
+    <Button
+        android:id="@+id/open_button"
+        style="@style/StrideNotesTextButton"
+        android:text="@string/note_ai_view_artifact" />
+</LinearLayout>
