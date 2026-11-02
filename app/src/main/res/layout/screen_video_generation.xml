@@ -1,0 +1,56 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true" android:background="@color/workspace_surface" android:scrollbars="none">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="24dp" android:background="@drawable/bg_video_studio_header">
+            <TextView style="@style/VideoStudioBody" android:text="@string/video_eyebrow" android:textColor="#DAD2FA" android:letterSpacing="0.16" android:textSize="10sp" />
+            <TextView style="@style/VideoStudioHeading" android:text="@string/video_hero_title" android:textColor="#FFFFFF" android:textSize="32sp" android:layout_marginTop="14dp" />
+            <TextView style="@style/VideoStudioBody" android:text="@string/video_hero_detail" android:textColor="#E7E0FC" android:layout_marginTop="10dp" />
+            <TextView style="@style/VideoStudioBody" android:text="@string/video_duration_badge" android:textColor="#FFFFFF" android:fontFamily="sans-serif-medium" android:textSize="11sp" android:letterSpacing="0.08" android:layout_marginTop="24dp" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/composer" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="20dp" android:layout_marginTop="20dp" android:background="@drawable/bg_video_studio_card">
+            <TextView style="@style/VideoStudioHeading" android:text="@string/video_image_heading" />
+            <FrameLayout android:layout_width="match_parent" android:layout_height="180dp" android:layout_marginTop="16dp" android:background="@drawable/bg_video_studio_input" android:clipToOutline="true">
+                <LinearLayout android:id="@+id/image_placeholder" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="24dp">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_workspace_video" android:importantForAccessibility="no" />
+                    <TextView android:id="@+id/image_hint" style="@style/VideoStudioBody" android:text="@string/video_image_hint" android:gravity="center" android:layout_marginTop="12dp" />
+                </LinearLayout>
+                <ImageView android:id="@+id/image_preview" android:layout_width="match_parent" android:layout_height="match_parent" android:scaleType="fitCenter" android:contentDescription="@string/video_image_description" android:visibility="gone" />
+            </FrameLayout>
+            <Button android:id="@+id/choose_image" style="@style/VideoStudioSecondary" android:layout_marginTop="12dp" android:text="@string/video_choose" />
+            <Button android:id="@+id/clear_image" style="@style/VideoStudioSecondary" android:layout_marginTop="8dp" android:text="@string/video_clear_image" android:visibility="gone" />
+            <TextView style="@style/VideoStudioHeading" android:text="@string/video_prompt_heading" android:textSize="16sp" android:layout_marginTop="24dp" />
+            <EditText android:id="@+id/prompt_input" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="112dp"
+                android:background="@drawable/bg_video_studio_input" android:padding="16dp" android:textSize="14sp" android:textColor="@color/workspace_ink" android:textColorHint="@color/workspace_secondary"
+                android:gravity="top" android:inputType="textMultiLine|textCapSentences" android:maxLength="1000" android:hint="@string/video_prompt_example" android:contentDescription="@string/video_prompt" android:layout_marginTop="12dp" />
+            <Button android:id="@+id/generate" style="@style/VideoStudioAction" android:layout_marginTop="20dp" android:text="@string/video_generate" />
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp"
+            android:layout_marginTop="16dp" android:background="@drawable/bg_video_studio_card">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView style="@style/VideoStudioHeading" android:layout_width="0dp" android:layout_weight="1" android:text="@string/video_timeline" android:textSize="17sp" />
+                <Button android:id="@+id/refresh" style="@style/VideoStudioSecondary" android:layout_width="wrap_content" android:text="@string/video_refresh" />
+            </LinearLayout>
+            <TextView android:id="@+id/scene_count" style="@style/VideoStudioBody" android:layout_marginTop="12dp" />
+            <ProgressBar android:id="@+id/scene_progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="6dp" android:max="6" android:progressTint="@color/workspace_accent" android:layout_marginTop="12dp" />
+            <TextView android:id="@+id/message" style="@style/VideoStudioBody" android:layout_marginTop="12dp" android:accessibilityLiveRegion="polite" />
+            <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="3dp" android:indeterminate="true" android:indeterminateTint="@color/workspace_accent" android:visibility="gone" android:layout_marginTop="8dp" />
+            <TextView android:id="@+id/empty" style="@style/VideoStudioBody" android:text="@string/video_empty" android:layout_marginTop="12dp" />
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/clips_list" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" android:layout_marginTop="12dp" android:overScrollMode="never" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/reel_actions" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+            android:padding="20dp" android:layout_marginTop="16dp" android:background="@drawable/bg_video_studio_card" android:visibility="gone">
+            <TextView style="@style/VideoStudioHeading" android:text="@string/video_export_heading" />
+            <TextView style="@style/VideoStudioBody" android:text="@string/video_export_detail" android:layout_marginTop="8dp" />
+            <Button android:id="@+id/export_reel" style="@style/VideoStudioAction" android:text="@string/video_export" android:layout_marginTop="16dp" />
+            <Button android:id="@+id/play_reel" style="@style/VideoStudioSecondary" android:text="@string/video_play_reel" android:layout_marginTop="12dp" />
+            <Button android:id="@+id/save_reel" style="@style/VideoStudioAction" android:text="@string/video_save_reel" android:layout_marginTop="12dp" />
+        </LinearLayout>
+        <Button android:id="@+id/new_reel" style="@style/VideoStudioSecondary" android:text="@string/video_new_reel" android:layout_marginTop="16dp" android:visibility="gone" />
+        <TextView style="@style/VideoStudioBody" android:text="@string/video_notice" android:textSize="12sp" android:padding="8dp" android:layout_marginTop="16dp" />
+    </LinearLayout>
+</ScrollView>

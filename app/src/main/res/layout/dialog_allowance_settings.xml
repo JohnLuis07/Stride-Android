@@ -1,0 +1,13 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_currency" android:labelFor="@id/currency_input" />
+        <EditText android:id="@+id/currency_input" style="@style/AllowanceInput" android:inputType="textCapCharacters" android:maxLength="3" android:singleLine="true" />
+        <TextView android:id="@+id/currency_hint" style="@style/AllowanceBody" android:text="@string/allowance_currency_hint" android:textSize="12sp" />
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_payday" android:labelFor="@id/payday_button" android:layout_marginTop="20dp" />
+        <Button android:id="@+id/payday_button" style="@style/AllowanceButton" android:text="@string/allowance_choose_payday" />
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_reserved" android:labelFor="@id/reserve_input" android:layout_marginTop="16dp" />
+        <EditText android:id="@+id/reserve_input" style="@style/AllowanceInput" android:inputType="numberDecimal" android:maxLength="16" android:singleLine="true" />
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_reserve_hint" />
+        <TextView android:id="@+id/error" style="@style/AllowanceBody" android:textColor="@color/allowance_expense" android:accessibilityLiveRegion="polite" android:visibility="gone" android:layout_marginTop="12dp" />
+    </LinearLayout>
+</ScrollView>

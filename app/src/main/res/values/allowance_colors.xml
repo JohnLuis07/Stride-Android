@@ -1,0 +1,6 @@
+<resources>
+    <color name="allowance_accent">#17785E</color>
+    <color name="allowance_soft">#E8F4EE</color>
+    <color name="allowance_expense">#A83C4F</color>
+    <color name="allowance_border">#E1EBE5</color>
+</resources>

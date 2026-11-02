@@ -1,0 +1,13 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:padding="16dp" android:layout_marginBottom="12dp" android:background="@drawable/bg_allowance_card">
+    <TextView android:id="@+id/category" style="@style/AllowanceHeading" android:textSize="16sp" android:accessibilityHeading="false" />
+    <TextView android:id="@+id/amount" style="@style/AllowanceHeading" android:textSize="23sp" android:layout_marginTop="8dp" android:accessibilityHeading="false" />
+    <TextView android:id="@+id/metadata" style="@style/AllowanceBody" android:layout_marginTop="6dp" />
+    <TextView android:id="@+id/status" style="@style/AllowanceBody" android:textColor="@color/allowance_accent" android:layout_marginTop="6dp" />
+    <TextView android:id="@+id/note" style="@style/AllowanceBody" android:layout_marginTop="6dp" />
+    <Button android:id="@+id/confirm" style="@style/AllowancePrimaryButton" android:visibility="gone" android:layout_marginTop="10dp" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="10dp">
+        <Button android:id="@+id/edit" style="@style/AllowanceButton" android:layout_width="0dp" android:layout_weight="1" android:text="@string/allowance_edit" />
+        <Button android:id="@+id/delete" style="@style/AllowanceButton" android:layout_width="0dp" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/allowance_delete" android:textColor="@color/allowance_expense" />
+    </LinearLayout>
+</LinearLayout>

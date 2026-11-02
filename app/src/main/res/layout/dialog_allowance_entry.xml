@@ -1,0 +1,16 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+        <CheckBox android:id="@+id/planned" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp" android:text="@string/allowance_plan_entry" />
+        <TextView android:id="@+id/status_hint" style="@style/AllowanceBody" android:text="@string/allowance_plan_hint" android:layout_marginBottom="12dp" />
+        <TextView android:id="@+id/amount_label" style="@style/AllowanceBody" android:labelFor="@id/amount_input" />
+        <EditText android:id="@+id/amount_input" style="@style/AllowanceInput" android:inputType="numberDecimal" android:maxLength="16" android:singleLine="true" />
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_amount_hint" android:textSize="12sp" />
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_category" android:labelFor="@id/category_input" android:layout_marginTop="16dp" />
+        <EditText android:id="@+id/category_input" style="@style/AllowanceInput" android:inputType="textCapSentences" android:maxLength="60" android:singleLine="true" />
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_date" android:labelFor="@id/date_button" />
+        <Button android:id="@+id/date_button" style="@style/AllowanceButton" />
+        <TextView style="@style/AllowanceBody" android:text="@string/allowance_note" android:labelFor="@id/note_input" android:layout_marginTop="12dp" />
+        <EditText android:id="@+id/note_input" style="@style/AllowanceInput" android:inputType="textMultiLine|textCapSentences" android:maxLength="280" android:minLines="2" android:gravity="top" />
+        <TextView android:id="@+id/error" style="@style/AllowanceBody" android:textColor="@color/allowance_expense" android:accessibilityLiveRegion="polite" android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>
