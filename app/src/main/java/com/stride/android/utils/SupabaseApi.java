@@ -26,8 +26,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -48,6 +51,7 @@ public final class SupabaseApi {
     private final ExecutorService functionExecutor = Executors.newFixedThreadPool(2);
     private final Handler main = new Handler(Looper.getMainLooper());
     private final Object sessionLock = new Object();
+    private final Set<FunctionStream> activeStreams = ConcurrentHashMap.newKeySet();
     private final AtomicFile sessionFile;
     private volatile boolean closed;
     private volatile int generation;
@@ -64,6 +68,14 @@ public final class SupabaseApi {
 
     public interface JsonCallback {
         void done(JSONObject data, String error);
+    }
+
+    public interface StreamCallback extends JsonCallback {
+        void event(String name, JSONObject data);
+    }
+
+    public interface RequestHandle {
+        void cancel();
     }
 
     public SupabaseApi(Context context) {
@@ -129,6 +141,7 @@ public final class SupabaseApi {
         synchronized (sessionLock) {
             generation++;
         }
+        for (FunctionStream stream : activeStreams) stream.cancel();
     }
 
     private void authAction(String method, String endpoint, JSONObject body, boolean authenticated, AuthCallback callback) {
@@ -259,7 +272,7 @@ public final class SupabaseApi {
 
     /** Keys remain on the server. Function calls always carry a verified Auth JWT. */
     public void invokeFunction(String name, JSONObject body, JsonCallback callback) {
-        if (!"notes-ai".equals(name)) {
+        if (!"notes-ai".equals(name) && !"generate-video".equals(name)) {
             callback.done(null, "INVALID_ACTION");
             return;
         }
@@ -282,6 +295,232 @@ public final class SupabaseApi {
                 }
             });
         });
+    }
+
+    /** Delivers real server events; a closed stream without a completion event is a failure. */
+    public RequestHandle streamFunction(String name, JSONObject body, StreamCallback callback) {
+        FunctionStream stream = new FunctionStream(generation, callback);
+        if (!"notes-ai".equals(name) || !"chat".equals(body.optString("action"))) {
+            stream.finish(null, "INVALID_ACTION");
+            return stream;
+        }
+        if (closed) {
+            stream.cancel();
+            return stream;
+        }
+        activeStreams.add(stream);
+        main.postDelayed(stream.timeout, 145000);
+        functionExecutor.execute(() -> stream.run(body));
+        return stream;
+    }
+
+    private AuthSession streamSession(int request, AuthSession rejected) throws Exception {
+        synchronized (sessionLock) {
+            checkGeneration(request);
+            AuthSession current = session;
+            if (current == null) throw new IllegalStateException(SESSION_EXPIRED);
+            if ((rejected != null && current.accessToken.equals(rejected.accessToken))
+                    || current.expiresAt <= System.currentTimeMillis() / 1000L + 60L) {
+                current = exchange("refresh_token", FeatureUi.obj("refresh_token", current.refreshToken), request);
+            }
+            return current;
+        }
+    }
+
+    private final class FunctionStream implements RequestHandle {
+        private static final int MAX_FRAME = 262144;
+        private final int request;
+        private final StreamCallback callback;
+        private final AtomicBoolean finished = new AtomicBoolean();
+        private volatile boolean cancelled;
+        private volatile HttpURLConnection connection;
+        private boolean delivered;
+        private String event = "";
+        private final StringBuilder data = new StringBuilder();
+        private int frameSize, answerLength;
+        private JSONObject result;
+        private final Runnable timeout = () -> {
+            finish(null, "REQUEST_TIMEOUT");
+            disconnect();
+        };
+
+        FunctionStream(int request, StreamCallback callback) {
+            this.request = request;
+            this.callback = callback;
+        }
+
+        @Override public void cancel() {
+            cancelled = true;
+            finished.set(true);
+            main.removeCallbacks(timeout);
+            activeStreams.remove(this);
+            disconnect();
+        }
+
+        private void disconnect() {
+            HttpURLConnection active = connection;
+            if (active != null) active.disconnect();
+        }
+
+        private void check() {
+            checkGeneration(request);
+            if (cancelled || finished.get()) throw new IllegalStateException("AI_STREAM_INTERRUPTED");
+        }
+
+        private void finish(JSONObject value, String error) {
+            if (!finished.compareAndSet(false, true)) return;
+            main.removeCallbacks(timeout);
+            main.post(() -> {
+                if (!cancelled && !closed && request == generation && !delivered) {
+                    delivered = true;
+                    callback.done(value, error);
+                }
+            });
+        }
+
+        private void postEvent(String name, JSONObject value) {
+            if (finished.get()) return;
+            main.post(() -> {
+                if (!cancelled && !closed && request == generation && !delivered) callback.event(name, value);
+            });
+        }
+
+        private void run(JSONObject body) {
+            try {
+                check();
+                String payload = new JSONObject(body.toString()).put("stream", true).toString();
+                AuthSession current = streamSession(request, null);
+                for (int attempt = 0; attempt < 2; attempt++) {
+                    check();
+                    HttpURLConnection active = (HttpURLConnection) new URL(BASE + "functions/v1/notes-ai").openConnection();
+                    connection = active;
+                    try {
+                        check();
+                        active.setRequestMethod("POST");
+                        active.setInstanceFollowRedirects(false);
+                        active.setConnectTimeout(12000);
+                        active.setReadTimeout(35000);
+                        active.setRequestProperty("apikey", KEY);
+                        active.setRequestProperty("Authorization", "Bearer " + current.accessToken);
+                        active.setRequestProperty("Content-Type", "application/json");
+                        active.setRequestProperty("Accept", "text/event-stream, application/json");
+                        active.setRequestProperty("Accept-Encoding", "identity");
+                        active.setDoOutput(true);
+                        byte[] bytes = payload.getBytes(StandardCharsets.UTF_8);
+                        active.setFixedLengthStreamingMode(bytes.length);
+                        try (OutputStream output = active.getOutputStream()) { output.write(bytes); }
+                        int status = active.getResponseCode();
+                        check();
+                        // A gateway rejection happens before generation; retry it once with a fresh session.
+                        if (status == 401 && attempt == 0) {
+                            active.disconnect();
+                            current = streamSession(request, current);
+                            continue;
+                        }
+                        if (status < 200 || status >= 300) {
+                            throw new HttpFailure(status, readBounded(active.getErrorStream()));
+                        }
+                        String type = active.getContentType();
+                        if (type != null && type.toLowerCase(Locale.ROOT).startsWith("text/event-stream")) {
+                            readStream(active.getInputStream());
+                        } else {
+                            // Supports a saved JSON response during a staged backend deployment.
+                            result = new JSONObject(readBounded(active.getInputStream()));
+                            if (result.has("error")) throw new IllegalStateException(result.toString());
+                        }
+                        if (result == null) throw new IllegalStateException("AI_STREAM_INTERRUPTED");
+                        finish(result, null);
+                        return;
+                    } finally {
+                        active.disconnect();
+                        connection = null;
+                    }
+                }
+            } catch (Exception error) {
+                String code = error instanceof SocketTimeoutException ? "REQUEST_TIMEOUT"
+                        : error instanceof IOException ? "AI_STREAM_INTERRUPTED"
+                        : error instanceof org.json.JSONException ? "AI_RESPONSE_INVALID" : safeError(error);
+                finish(null, code);
+            } finally {
+                main.removeCallbacks(timeout);
+                activeStreams.remove(this);
+                disconnect();
+            }
+        }
+
+        private String readBounded(InputStream input) throws Exception {
+            if (input == null) return "";
+            try (InputStreamReader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
+                StringBuilder value = new StringBuilder();
+                char[] buffer = new char[2048];
+                int count;
+                while ((count = reader.read(buffer)) != -1) {
+                    check();
+                    if (value.length() + count > MAX_FRAME) throw new IllegalStateException("AI_RESPONSE_INVALID");
+                    value.append(buffer, 0, count);
+                }
+                return value.toString();
+            }
+        }
+
+        private void readStream(InputStream input) throws Exception {
+            try (InputStreamReader reader = new InputStreamReader(input, StandardCharsets.UTF_8)) {
+                StringBuilder line = new StringBuilder();
+                char[] buffer = new char[2048];
+                int count, total = 0;
+                while ((count = reader.read(buffer)) != -1) {
+                    check();
+                    total += count;
+                    if (total > 1048576) throw new IllegalStateException("AI_RESPONSE_INVALID");
+                    for (int i = 0; i < count; i++) {
+                        if (buffer[i] == '\n') {
+                            acceptLine(line.toString());
+                            line.setLength(0);
+                            if (result != null) return;
+                        } else {
+                            line.append(buffer[i]);
+                            if (line.length() > MAX_FRAME) throw new IllegalStateException("AI_RESPONSE_INVALID");
+                        }
+                    }
+                }
+                if (line.length() > 0) acceptLine(line.toString());
+                if (data.length() > 0) acceptLine("");
+            }
+        }
+
+        private void acceptLine(String line) throws Exception {
+            if (line.endsWith("\r")) line = line.substring(0, line.length() - 1);
+            if (line.isEmpty()) {
+                if (data.length() > 0) {
+                    JSONObject value = new JSONObject(data.toString());
+                    if ("error".equals(event)) {
+                        String code = machineCode(value.optString("error"));
+                        throw new IllegalStateException(FeatureUi.obj("error",
+                                code.isEmpty() ? "AI_STREAM_INTERRUPTED" : code).toString());
+                    }
+                    if ("complete".equals(event)) result = value;
+                    else if ("delta".equals(event)) {
+                        Object text = value.opt("text");
+                        if (!(text instanceof String)) throw new IllegalStateException("AI_RESPONSE_INVALID");
+                        answerLength += ((String) text).length();
+                        if (answerLength > 32000) throw new IllegalStateException("AI_RESPONSE_INVALID");
+                        postEvent(event, value);
+                    } else if ("status".equals(event)) postEvent(event, value);
+                }
+                event = "";
+                data.setLength(0);
+                frameSize = 0;
+            } else if (!line.startsWith(":")) {
+                frameSize += line.length();
+                if (frameSize > MAX_FRAME) throw new IllegalStateException("AI_RESPONSE_INVALID");
+                if (line.startsWith("event:")) event = line.substring(6).trim();
+                else if (line.startsWith("data:")) {
+                    if (data.length() > 0) data.append('\n');
+                    String part = line.substring(5);
+                    data.append(part.startsWith(" ") ? part.substring(1) : part);
+                }
+            }
+        }
     }
 
     public static boolean isStorageUrl(String value) {
@@ -392,6 +631,7 @@ public final class SupabaseApi {
             googleSessionRequired = true;
             sessionFile.delete();
         }
+        for (FunctionStream stream : activeStreams) stream.cancel();
         if (previous != null && !closed) {
             executor.execute(() -> {
                 try {
@@ -405,6 +645,7 @@ public final class SupabaseApi {
 
     public void close() {
         closed = true;
+        for (FunctionStream stream : activeStreams) stream.cancel();
         executor.shutdownNow();
         functionExecutor.shutdownNow();
         main.removeCallbacksAndMessages(null);

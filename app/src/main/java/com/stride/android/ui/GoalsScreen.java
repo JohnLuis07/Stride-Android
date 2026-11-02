@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.stride.android.R;
 import com.stride.android.adapter.GoalAdapter;
@@ -24,9 +25,26 @@ import org.json.JSONObject;
 public final class GoalsScreen implements FeatureScreen {
     private final ComponentActivity activity;
     private final ScreenGoalsBinding binding;
+    private final LoadingView loadingView;
     private final GoalsViewModel viewModel;
     private final Observer<GoalsState> observer = this::render;
     private GoalAdapter adapter;
+    private final RecyclerView.AdapterDataObserver dataObserver = new RecyclerView.AdapterDataObserver() {
+        @Override
+        public void onChanged() {
+            revealLoadedGoals();
+        }
+
+        @Override
+        public void onItemRangeInserted(int positionStart, int itemCount) {
+            revealLoadedGoals();
+        }
+
+        @Override
+        public void onItemRangeRemoved(int positionStart, int itemCount) {
+            revealLoadedGoals();
+        }
+    };
     private GoalEditor editor;
     private AlertDialog confirmation;
     private CalendarDates.DateObserver dateObserver;
@@ -38,11 +56,12 @@ public final class GoalsScreen implements FeatureScreen {
         viewModel = new ViewModelProvider(activity).get(
                 "goals:" + user.optString("id"), GoalsViewModel.class);
         viewModel.configure(api, user.optString("id"));
+        loadingView = new LoadingView(activity, binding.getRoot(), viewModel::reload);
     }
 
     @Override
     public View root() {
-        return binding.getRoot();
+        return loadingView.root();
     }
 
     public void bind() {
@@ -91,18 +110,29 @@ public final class GoalsScreen implements FeatureScreen {
         binding.goalsContent.setLayoutManager(new LinearLayoutManager(activity));
         binding.goalsContent.setItemAnimator(null);
         binding.goalsContent.setAdapter(adapter);
+        adapter.registerAdapterDataObserver(dataObserver);
         viewModel.state().observe(activity, observer);
         dateObserver = new CalendarDates.DateObserver(activity, activity, () -> {
             if (!closed) {
                 adapter.notifyItemRangeChanged(0, adapter.getItemCount());
             }
         });
+        loadingView.update(true, false);
         viewModel.reload();
     }
 
     private void render(GoalsState state) {
         if (!closed) {
             adapter.submitState(state);
+            revealLoadedGoals();
+        }
+    }
+
+    private void revealLoadedGoals() {
+        GoalsState state = viewModel.state().getValue();
+        if (!closed && state != null && (state.loading || state.loadFailed
+                || adapter.getItemCount() == state.visibleGoals.size() + 1)) {
+            loadingView.update(state.loading, state.loadFailed);
         }
     }
 
@@ -149,6 +179,9 @@ public final class GoalsScreen implements FeatureScreen {
             return;
         }
         closed = true;
+        if (adapter != null) {
+            adapter.unregisterAdapterDataObserver(dataObserver);
+        }
         if (dateObserver != null) {
             dateObserver.close();
         }

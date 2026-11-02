@@ -2,6 +2,8 @@ package com.stride.android.viewmodel;
 
 import android.app.Application;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -42,6 +44,13 @@ public final class NoteAiViewModel extends AndroidViewModel {
     private final Map<String, StudyProgress> progress = new HashMap<>();
     private final Map<String, String> savedNoteRequests = new HashMap<>();
     private final Set<String> savedArtifacts = new HashSet<>();
+    private final Handler streamHandler = new Handler(Looper.getMainLooper());
+    private final StringBuilder streamedAnswer = new StringBuilder();
+    private final Runnable renderStream = this::publishStream;
+    private NoteAiState.Message partialMessage;
+    private String activeChatId = "", activeChatQuestion = "";
+    private int chatGeneration;
+    private boolean streamRenderPending;
     private NoteAiApi client;
     private SupabaseApi api;
     private Note note;
@@ -65,6 +74,11 @@ public final class NoteAiViewModel extends AndroidViewModel {
             loading = false;
             pendingRequest = "";
             pendingSignature = "";
+            chatGeneration++;
+            streamHandler.removeCallbacks(renderStream);
+            streamRenderPending = false;
+            partialMessage = null;
+            streamedAnswer.setLength(0);
         }
         this.api = api;
         this.note = note;
@@ -120,6 +134,18 @@ public final class NoteAiViewModel extends AndroidViewModel {
                     JSONObject row = rows.optJSONObject(i);
                     if (row != null) messages.add(new NoteAiState.Message(row));
                 }
+                if (partialMessage != null) for (NoteAiState.Message message : messages) {
+                    if (message.id.equals(partialMessage.id)) {
+                        // A refresh can recover an answer saved just before the connection ended.
+                        partialMessage = null;
+                        if (message.id.equals(pendingRequest)) {
+                            if (question.trim().equals(message.question)) question = "";
+                            pendingRequest = "";
+                            pendingSignature = "";
+                        }
+                        break;
+                    }
+                }
                 rows = value.optJSONArray("artifacts");
                 if (rows != null) for (int i = 0; i < rows.length(); i++) {
                     JSONObject row = rows.optJSONObject(i);
@@ -162,10 +188,13 @@ public final class NoteAiViewModel extends AndroidViewModel {
             payload.put("kind", kind).put("question", question.trim()).put("source_ids", new JSONArray(ids))
                     .put("request_id", pendingRequest);
         } catch (org.json.JSONException ignored) { }
+        if ("chat".equals(kind)) {
+            streamChat(payload);
+            return;
+        }
         client.call(payload, (value, failure) -> {
             if (failure == null && value != null) {
-                if ("chat".equals(kind)) question = "";
-                tab = "chat".equals(kind) ? "chat" : "study";
+                tab = "study";
                 pendingRequest = "";
                 pendingSignature = "";
             } else if (!isTransportFailure(failure)) {
@@ -176,6 +205,75 @@ public final class NoteAiViewModel extends AndroidViewModel {
             finish(failure);
             if (failure == null) reload();
         });
+    }
+
+    private void streamChat(JSONObject payload) {
+        int operation = ++chatGeneration;
+        activeChatId = pendingRequest;
+        activeChatQuestion = question.trim();
+        streamedAnswer.setLength(0);
+        partialMessage = new NoteAiState.Message(activeChatId, activeChatQuestion, "", true, false);
+        publish();
+        client.stream(payload, new SupabaseApi.StreamCallback() {
+            @Override public void event(String name, JSONObject value) {
+                if (operation != chatGeneration || !busy) return;
+                if ("delta".equals(name)) {
+                    streamedAnswer.append(value.optString("text"));
+                    stage = R.string.note_ai_receiving;
+                    if (!streamRenderPending) {
+                        streamRenderPending = true;
+                        // Coalesce actual received chunks into smooth UI updates.
+                        streamHandler.postDelayed(renderStream, 40);
+                    }
+                } else if ("status".equals(name)) {
+                    if ("saving".equals(value.optString("stage"))) {
+                        stage = R.string.note_ai_saving_answer;
+                        streamHandler.removeCallbacks(renderStream);
+                        publishStream();
+                    }
+                }
+            }
+
+            @Override public void done(JSONObject value, String failure) {
+                if (operation != chatGeneration) return;
+                streamHandler.removeCallbacks(renderStream);
+                streamRenderPending = false;
+                JSONObject row = value == null ? null : value.optJSONObject("message");
+                boolean complete = failure == null && row != null && activeChatId.equals(row.optString("id"))
+                        && !row.optString("answer").trim().isEmpty();
+                String problem = failure;
+                if (complete) {
+                    NoteAiState.Message message = new NoteAiState.Message(row);
+                    int existing = -1;
+                    for (int i = 0; i < messages.size(); i++) {
+                        if (messages.get(i).id.equals(message.id)) { existing = i; break; }
+                    }
+                    if (existing >= 0) messages.set(existing, message); else messages.add(message);
+                    if (messages.size() > 50) messages.remove(0);
+                    partialMessage = null;
+                    question = "";
+                    pendingRequest = "";
+                    pendingSignature = "";
+                } else {
+                    if (problem == null) problem = "AI_STREAM_INTERRUPTED";
+                    partialMessage = streamedAnswer.length() == 0 ? null : new NoteAiState.Message(
+                            activeChatId, activeChatQuestion, streamedAnswer.toString(), false, true);
+                    if (!isTransportFailure(problem)) {
+                        pendingRequest = "";
+                        pendingSignature = "";
+                    }
+                }
+                streamedAnswer.setLength(0);
+                finish(problem);
+            }
+        });
+    }
+
+    private void publishStream() {
+        streamRenderPending = false;
+        if (!busy || partialMessage == null) return;
+        partialMessage = new NoteAiState.Message(activeChatId, activeChatQuestion, streamedAnswer.toString(), true, false);
+        publish();
     }
 
     private boolean isTransportFailure(String failure) {
@@ -212,10 +310,21 @@ public final class NoteAiViewModel extends AndroidViewModel {
         busy = false; stage = 0; error = failure == null ? 0 : NoteAiApi.errorResource(failure); publish();
     }
     private void publish() {
-        state.setValue(new NoteAiState(sources, messages, artifacts, selected, tab, question, loading, busy, error, stage));
+        List<NoteAiState.Message> visibleMessages = messages;
+        if (partialMessage != null) {
+            visibleMessages = new ArrayList<>(messages);
+            for (int i = visibleMessages.size() - 1; i >= 0; i--) {
+                if (visibleMessages.get(i).id.equals(partialMessage.id)) visibleMessages.remove(i);
+            }
+            visibleMessages.add(partialMessage);
+            if (visibleMessages.size() > 50) visibleMessages.remove(0);
+        }
+        state.setValue(new NoteAiState(sources, visibleMessages, artifacts, selected, tab, question, loading, busy, error, stage));
     }
     @Override protected void onCleared() {
         loadGeneration++;
+        chatGeneration++;
+        streamHandler.removeCallbacksAndMessages(null);
         if (client != null) client.close();
     }
 }

@@ -1,13 +1,16 @@
 package com.stride.android.viewmodel;
 
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.stride.android.R;
 import com.stride.android.model.Task;
 import com.stride.android.model.TasksState;
 import com.stride.android.utils.CalendarDates;
+import com.stride.android.utils.DeadlineReminders;
 import com.stride.android.utils.FeatureUi;
 import com.stride.android.utils.SupabaseApi;
 
@@ -18,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** User-scoped task reads and serialized mutations, independent of screen lifetime. */
-public final class TasksViewModel extends ViewModel {
+public final class TasksViewModel extends AndroidViewModel {
     public interface Result {
         void done(boolean success);
 
@@ -32,12 +35,14 @@ public final class TasksViewModel extends ViewModel {
     private SupabaseApi api;
     private String userId;
     private String filter = "all";
+    private String sort = TasksState.SORT_NEWEST;
     private int readGeneration;
     private boolean loading;
     private boolean saving;
     private boolean loadFailed;
 
-    public TasksViewModel() {
+    public TasksViewModel(Application application) {
+        super(application);
         publish();
     }
 
@@ -53,6 +58,13 @@ public final class TasksViewModel extends ViewModel {
     public void setFilter(String filter) {
         if (Arrays.asList("all", "todo", "doing", "done").contains(filter)) {
             this.filter = filter;
+            publish();
+        }
+    }
+
+    public void setSort(String sort) {
+        if (TasksState.SORT_NEWEST.equals(sort) || TasksState.SORT_DEADLINE.equals(sort)) {
+            this.sort = sort;
             publish();
         }
     }
@@ -81,6 +93,7 @@ public final class TasksViewModel extends ViewModel {
                             }
                         }
                     }
+                    if (error == null) syncReminders();
                     publish();
                 });
     }
@@ -105,12 +118,14 @@ public final class TasksViewModel extends ViewModel {
                 latest == null ? "" : latest.dueDate, latest == null ? "" : latest.deadlineTimezone);
         beginMutation();
         JSONObject payload = FeatureUi.obj("title", task.title.trim(),
+                "reminder_sound", task.reminderSound,
                 "details", nullable(task.details.trim()), "due_date", nullable(task.dueDate),
                 "deadline_time", nullable(task.deadlineTime),
                 "deadline_timezone", nullable(timezone),
                 "priority", task.priority, "updated_at", FeatureUi.now());
         if (task.id.isEmpty()) {
             payload = FeatureUi.obj("user_id", userId, "title", task.title.trim(),
+                    "reminder_sound", task.reminderSound,
                     "details", nullable(task.details.trim()), "due_date", nullable(task.dueDate),
                     "deadline_time", nullable(task.deadlineTime),
                     "deadline_timezone", nullable(timezone),
@@ -200,8 +215,10 @@ public final class TasksViewModel extends ViewModel {
                     tasks.set(index, saved);
                 }
             }
+            if (success) syncReminders();
             publish();
             if (success) {
+                reload();
                 result.done(true);
             } else {
                 result.failed(saveErrorResource(error));
@@ -242,6 +259,7 @@ public final class TasksViewModel extends ViewModel {
                     }
                 }
             }
+            if (success) syncReminders();
             publish();
             result.done(success);
         });
@@ -275,8 +293,12 @@ public final class TasksViewModel extends ViewModel {
         return value.isEmpty() ? JSONObject.NULL : value;
     }
 
+    private void syncReminders() {
+        DeadlineReminders.get(getApplication()).syncTasks(userId, tasks);
+    }
+
     private void publish() {
-        state.setValue(new TasksState(tasks, filter, loading, saving, loadFailed));
+        state.setValue(new TasksState(tasks, filter, sort, loading, saving, loadFailed));
     }
 
     @Override

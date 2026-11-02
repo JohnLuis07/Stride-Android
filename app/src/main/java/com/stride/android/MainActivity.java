@@ -1,28 +1,46 @@
 package com.stride.android;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.app.AlarmManager;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.stride.android.databinding.ActivityMainBinding;
 import com.stride.android.ui.CalendarScreen;
+import com.stride.android.ui.AllowanceScreen;
 import com.stride.android.ui.DashboardScreen;
 import com.stride.android.ui.FeatureScreen;
 import com.stride.android.ui.FocusScreen;
 import com.stride.android.ui.GoalsScreen;
 import com.stride.android.ui.LoginScreen;
+import com.stride.android.ui.LoadingView;
 import com.stride.android.ui.NotesScreen;
 import com.stride.android.ui.SettingsScreen;
 import com.stride.android.ui.SignupScreen;
 import com.stride.android.ui.TasksScreen;
+import com.stride.android.ui.VideoGenerationScreen;
 import com.stride.android.viewmodel.FocusViewModel;
 import com.stride.android.viewmodel.SessionViewModel;
+import com.stride.android.utils.DeadlineReminders;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.Locale;
 
@@ -34,6 +52,15 @@ public class MainActivity extends ComponentActivity {
     private SessionViewModel session;
     private FocusViewModel focus;
     private String activePage = "Overview";
+    private AlertDialog signOutDialog;
+    private AlertDialog reminderPermissionDialog;
+    private final ActivityResultLauncher<String> notificationPermission = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted && session != null && session.user() != null) {
+                    DeadlineReminders.get(this).reconcile();
+                    requestExactReminderAccess();
+                }
+            });
 
     @Override
     public void onCreate(Bundle state) {
@@ -54,17 +81,97 @@ public class MainActivity extends ComponentActivity {
                 }
             }
         });
+        LoadingView startup = new LoadingView(this, null, null);
+        startup.showLoading(R.string.workspace_loading_session, R.string.workspace_loading_session_message);
+        setContentView(startup.root());
+        applySystemBarInsets(startup.root());
         session.restore(error -> {
             if (isFinishing() || isDestroyed()) {
                 return;
             }
             if (error == null) {
+                requestReminderPermissions();
+                if (openReminderPage()) return;
                 if (state != null && "Notes".equals(state.getString("active_page"))) showNotes();
+                else if (state != null && "Tasks".equals(state.getString("active_page"))) showTasks();
+                else if (state != null && "Goals".equals(state.getString("active_page"))) showGoals();
+                else if (state != null && "GenerateVideos".equals(state.getString("active_page"))) showGenerateVideos();
+                else if (state != null && "Allowance".equals(state.getString("active_page"))) showAllowance();
                 else showDashboard();
             } else {
                 signOut();
             }
         });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        openReminderPage();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (session != null && session.user() != null) {
+            DeadlineReminders reminders = DeadlineReminders.get(this);
+            reminders.reconcile();
+            reminders.refresh(session.api(), session.user().optString("id"));
+        }
+    }
+
+    private boolean openReminderPage() {
+        if (session == null || session.user() == null || getIntent() == null) return false;
+        String page = getIntent().getStringExtra(DeadlineReminders.EXTRA_PAGE);
+        String owner = getIntent().getStringExtra(DeadlineReminders.EXTRA_OWNER);
+        getIntent().removeExtra(DeadlineReminders.EXTRA_PAGE);
+        getIntent().removeExtra(DeadlineReminders.EXTRA_OWNER);
+        if (!session.user().optString("id").equals(owner)) return false;
+        if ("Tasks".equals(page)) {
+            showTasks();
+            return true;
+        }
+        if ("Goals".equals(page)) {
+            showGoals();
+            return true;
+        }
+        return false;
+    }
+
+    private void requestReminderPermissions() {
+        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            if (!getPreferences(MODE_PRIVATE).getBoolean("reminder_permission_asked", false)) {
+                getPreferences(MODE_PRIVATE).edit().putBoolean("reminder_permission_asked", true).apply();
+                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+            return;
+        }
+        DeadlineReminders.get(this).reconcile();
+        requestExactReminderAccess();
+    }
+
+    private void requestExactReminderAccess() {
+        if (Build.VERSION.SDK_INT < 31 || isFinishing() || isDestroyed()
+                || getSystemService(AlarmManager.class).canScheduleExactAlarms()
+                || getPreferences(MODE_PRIVATE).getBoolean("reminder_exact_asked", false)
+                || reminderPermissionDialog != null) return;
+        getPreferences(MODE_PRIVATE).edit().putBoolean("reminder_exact_asked", true).apply();
+        reminderPermissionDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.reminder_timing_title)
+                .setMessage(R.string.reminder_timing_message)
+                .setNegativeButton(R.string.reminder_later, null)
+                .setPositiveButton(R.string.reminder_allow, (dialog, which) -> {
+                    Intent settings = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                            Uri.parse("package:" + getPackageName()));
+                    try { startActivity(settings); }
+                    catch (android.content.ActivityNotFoundException ignored) {
+                        // Inexact alarms remain available on devices without this settings screen.
+                    }
+                }).create();
+        reminderPermissionDialog.setOnDismissListener(dialog -> reminderPermissionDialog = null);
+        reminderPermissionDialog.show();
     }
 
     @Override
@@ -81,6 +188,10 @@ public class MainActivity extends ComponentActivity {
 
     @Override
     protected void onDestroy() {
+        if (reminderPermissionDialog != null) reminderPermissionDialog.dismiss();
+        if (signOutDialog != null) {
+            signOutDialog.dismiss();
+        }
         closeScreen();
         super.onDestroy();
     }
@@ -164,8 +275,10 @@ public class MainActivity extends ComponentActivity {
         bindNavigation(mainBinding.navNotes, "Notes", this::showNotes);
         bindNavigation(mainBinding.navGoals, "Goals", this::showGoals);
         bindNavigation(mainBinding.navFocus, "Focus", this::showFocus);
+        bindNavigation(mainBinding.navAllowance, "Allowance", this::showAllowance);
         bindNavigation(mainBinding.navSettings, "Settings", this::showProfile);
-        bindNavigation(mainBinding.navLogout, "", this::signOut);
+        bindNavigation(mainBinding.navLogout, "", this::confirmSignOut);
+        updateDrawerFeatures();
 
         View panel = mainBinding.drawerPanel;
         mainBinding.getRoot().addOnLayoutChangeListener(
@@ -204,6 +317,39 @@ public class MainActivity extends ComponentActivity {
         mainBinding.drawerAvatar.setText(initials(name));
     }
 
+    private void updateDrawerFeatures() {
+        if (mainBinding == null || session.user() == null) {
+            return;
+        }
+        JSONArray features = session.user().optJSONArray("features");
+        if (features == null) {
+            try {
+                features = new JSONArray(session.user().optString("features", ""));
+            } catch (JSONException ignored) {
+                // Match Settings: absent or invalid preferences use the default selection.
+            }
+        }
+        setDrawerFeatureVisibility(mainBinding.navTasks, features, "Todo");
+        setDrawerFeatureVisibility(mainBinding.navCalendar, features, "Calendar");
+        setDrawerFeatureVisibility(mainBinding.navNotes, features, "Notes");
+        setDrawerFeatureVisibility(mainBinding.navGoals, features, "Goals");
+        setDrawerFeatureVisibility(mainBinding.navFocus, features, "Focus");
+        setDrawerFeatureVisibility(mainBinding.navAllowance, features, "Allowance");
+    }
+
+    private void setDrawerFeatureVisibility(View item, JSONArray features, String key) {
+        boolean selected = features == null;
+        if (features != null) {
+            for (int i = 0; i < features.length(); i++) {
+                if (key.equals(features.optString(i))) {
+                    selected = true;
+                    break;
+                }
+            }
+        }
+        item.setVisibility(selected ? View.VISIBLE : View.GONE);
+    }
+
     private String initials(String name) {
         if (name.isEmpty()) {
             return "S";
@@ -219,6 +365,7 @@ public class MainActivity extends ComponentActivity {
     private void openDrawer() {
         if (drawer != null) {
             updateDrawerProfile();
+            updateDrawerFeatures();
             mainBinding.workspaceContent.setImportantForAccessibility(
                     View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
             drawer.setVisibility(View.VISIBLE);
@@ -255,16 +402,47 @@ public class MainActivity extends ComponentActivity {
     private void showLogin() {
         LoginScreen screen = new LoginScreen(this, session);
         showAuthScreen(screen);
-        screen.bind(this::showDashboard, this::showSignup);
+        screen.bind(this::openWorkspace, this::showSignup);
     }
 
     private void showSignup() {
         SignupScreen screen = new SignupScreen(this, session);
         showAuthScreen(screen);
         screen.bind(() -> {
-            if (session.user() != null) showDashboard();
+            if (session.user() != null) openWorkspace();
             else showLogin();
         }, this::showLogin);
+    }
+
+    private void openWorkspace() {
+        requestReminderPermissions();
+        closeScreen();
+        mainBinding = null;
+        drawer = null;
+        LoadingView welcome = new LoadingView(this, null, null);
+        welcome.showLoading(R.string.workspace_loading_welcome, R.string.workspace_loading_welcome_message);
+        setContentView(welcome.root());
+        applySystemBarInsets(welcome.root());
+        // Allow the loading view to draw before binding the workspace, without a timed delay.
+        welcome.root().postOnAnimation(() -> welcome.root().post(() -> {
+            if (!isFinishing() && !isDestroyed() && welcome.root().isAttachedToWindow()) {
+                if (!openReminderPage()) showDashboard();
+            }
+        }));
+    }
+
+    private void confirmSignOut() {
+        if (isFinishing() || isDestroyed() || session.user() == null || signOutDialog != null) {
+            return;
+        }
+        signOutDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.settings_sign_out_title)
+                .setMessage(R.string.settings_sign_out_message)
+                .setNegativeButton(R.string.settings_cancel, null)
+                .setPositiveButton(R.string.settings_sign_out, (dialog, which) -> signOut())
+                .create();
+        signOutDialog.setOnDismissListener(dialog -> signOutDialog = null);
+        signOutDialog.show();
     }
 
     private void signOut() {
@@ -281,7 +459,27 @@ public class MainActivity extends ComponentActivity {
         DashboardScreen screen = new DashboardScreen(this, session.user());
         shell("Stride.", screen);
         screen.bind(this::showNotes, this::showCalendar, this::showTasks,
-                this::showGoals, this::showFocus);
+                this::showGoals, this::showFocus, this::showGenerateVideos, this::showAllowance);
+    }
+
+    private void showAllowance() {
+        if (!loggedIn()) return;
+        activePage = "Allowance";
+        AllowanceScreen screen = new AllowanceScreen(this, session.api(), session.user());
+        shell(getString(R.string.allowance_title), screen);
+        screen.bind();
+    }
+
+    private void showGenerateVideos() {
+        if (!loggedIn()) return;
+        if (!SessionViewModel.hasVideoFeature(session.user())) {
+            showDashboard();
+            return;
+        }
+        activePage = "GenerateVideos";
+        VideoGenerationScreen screen = new VideoGenerationScreen(this, session.api(), session.user().optString("id"));
+        shell(getString(R.string.video_title), screen);
+        screen.bind();
     }
 
     private void showTasks() {
@@ -339,7 +537,7 @@ public class MainActivity extends ComponentActivity {
             return;
         }
         activePage = "Settings";
-        SettingsScreen screen = new SettingsScreen(this, session, this::signOut);
+        SettingsScreen screen = new SettingsScreen(this, session, this::confirmSignOut);
         shell("Profile & settings", screen);
         screen.bind();
     }

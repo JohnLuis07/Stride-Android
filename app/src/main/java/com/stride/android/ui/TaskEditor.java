@@ -41,6 +41,7 @@ final class TaskEditor {
         this.viewModel = viewModel;
         this.original = original;
         binding = DialogTaskBinding.inflate(activity.getLayoutInflater());
+        binding.reminderSoundSwitch.setChecked(original == null || original.reminderSound);
         binding.titleInput.setText(original == null ? "" : original.title);
         binding.detailsInput.setText(original == null ? "" : original.details);
         dueDate = original == null ? "" : original.dueDate;
@@ -179,7 +180,8 @@ final class TaskEditor {
         Task task = new Task(original == null ? "" : original.id, title,
                 binding.detailsInput.getText().toString().trim(), dueDate,
                 priorities.get(binding.prioritySpinner.getSelectedItemPosition()),
-                original == null ? "todo" : original.status, dueTime);
+                original == null ? "todo" : original.status, dueTime,
+                binding.reminderSoundSwitch.isChecked());
         setSaving(true);
         viewModel.save(task, new TasksViewModel.Result() {
             @Override
@@ -212,6 +214,7 @@ final class TaskEditor {
         binding.timeButton.setEnabled(!saving && !dueDate.isEmpty());
         binding.clearTimeButton.setEnabled(!saving);
         binding.prioritySpinner.setEnabled(!saving);
+        binding.reminderSoundSwitch.setEnabled(!saving);
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(!saving);
         dialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(saving ? R.string.tasks_saving
                 : original == null ? R.string.tasks_create : R.string.tasks_update);

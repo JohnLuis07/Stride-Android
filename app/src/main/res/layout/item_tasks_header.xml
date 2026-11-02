@@ -198,9 +198,14 @@
             android:textStyle="bold"
             android:textColor="@color/tasks_ink" />
         <Button
+            android:id="@+id/sort_button"
+            style="@style/StrideTaskChip"
+            android:text="@string/tasks_sort_button" />
+        <Button
             android:id="@+id/refresh_button"
             style="@style/StrideTaskChip"
-            android:text="@string/tasks_refresh" />
+            android:layout_marginEnd="0dp"
+            android:text="@string/tasks_refresh_compact" />
     </LinearLayout>
 
     <HorizontalScrollView

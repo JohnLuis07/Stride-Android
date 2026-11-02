@@ -1,13 +1,16 @@
 package com.stride.android.viewmodel;
 
+import android.app.Application;
+
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.stride.android.R;
 import com.stride.android.model.Goal;
 import com.stride.android.model.GoalsState;
 import com.stride.android.utils.CalendarDates;
+import com.stride.android.utils.DeadlineReminders;
 import com.stride.android.utils.FeatureUi;
 import com.stride.android.utils.SupabaseApi;
 
@@ -19,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /** User-scoped reads and serialized writes outlive individual screen instances. */
-public final class GoalsViewModel extends ViewModel {
+public final class GoalsViewModel extends AndroidViewModel {
     public interface Result {
         void done(boolean success);
 
@@ -38,7 +41,8 @@ public final class GoalsViewModel extends ViewModel {
     private boolean saving;
     private boolean loadFailed;
 
-    public GoalsViewModel() {
+    public GoalsViewModel(Application application) {
+        super(application);
         publish();
     }
 
@@ -82,6 +86,7 @@ public final class GoalsViewModel extends ViewModel {
                             }
                         }
                     }
+                    if (error == null) syncReminders();
                     publish();
                 });
     }
@@ -106,6 +111,7 @@ public final class GoalsViewModel extends ViewModel {
         String timezone = CalendarDates.deadlineTimezone(draft.targetDate,
                 latest == null ? "" : latest.targetDate, latest == null ? "" : latest.deadlineTimezone);
         JSONObject payload = FeatureUi.obj("title", draft.title.trim(), "notes", nullable(draft.notes.trim()),
+                "reminder_sound", draft.reminderSound,
                 "target_value", draft.target, "unit", "%",
                 "target_date", nullable(draft.targetDate), "deadline_timezone", nullable(timezone),
                 "deadline_time", nullable(draft.deadlineTime),
@@ -179,6 +185,7 @@ public final class GoalsViewModel extends ViewModel {
                     }
                 }
             }
+            if (success) syncReminders();
             publish();
             result.done(success);
         });
@@ -206,8 +213,10 @@ public final class GoalsViewModel extends ViewModel {
                     goals.set(index, saved);
                 }
             }
+            if (success) syncReminders();
             publish();
             if (success) {
+                reload();
                 result.done(true);
             } else {
                 result.failed(saveErrorResource(error));
@@ -257,6 +266,10 @@ public final class GoalsViewModel extends ViewModel {
 
     private Object nullable(String value) {
         return value.isEmpty() ? JSONObject.NULL : value;
+    }
+
+    private void syncReminders() {
+        DeadlineReminders.get(getApplication()).syncGoals(userId, goals);
     }
 
     private void publish() {

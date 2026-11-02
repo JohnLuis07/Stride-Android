@@ -16,6 +16,7 @@ public final class Goal {
     public final String completedAt;
     public final String completedDeadlineAt;
     public final String deadlineTime;
+    public final boolean reminderSound;
 
     public Goal(String id, String title, String notes, double target, double current,
             String unit, String targetDate) {
@@ -24,12 +25,17 @@ public final class Goal {
 
     public Goal(String id, String title, String notes, double target, double current,
             String unit, String targetDate, String deadlineTime) {
-        this(id, title, notes, target, current, unit, targetDate, "", "", "", "", deadlineTime);
+        this(id, title, notes, target, current, unit, targetDate, deadlineTime, true);
+    }
+
+    public Goal(String id, String title, String notes, double target, double current,
+            String unit, String targetDate, String deadlineTime, boolean reminderSound) {
+        this(id, title, notes, target, current, unit, targetDate, "", "", "", "", deadlineTime, reminderSound);
     }
 
     private Goal(String id, String title, String notes, double target, double current,
             String unit, String targetDate, String deadlineTimezone, String deadlineAt,
-            String completedAt, String completedDeadlineAt, String deadlineTime) {
+            String completedAt, String completedDeadlineAt, String deadlineTime, boolean reminderSound) {
         this.id = id;
         this.title = title;
         this.notes = notes;
@@ -42,6 +48,7 @@ public final class Goal {
         this.completedAt = completedAt;
         this.completedDeadlineAt = completedDeadlineAt;
         this.deadlineTime = deadlineTime;
+        this.reminderSound = reminderSound;
     }
 
     public boolean completed() {
@@ -58,7 +65,7 @@ public final class Goal {
                 record.optDouble("target_value", 0), record.optDouble("current_value", 0),
                 text(record, "unit"), text(record, "target_date"), text(record, "deadline_timezone"),
                 text(record, "deadline_at"), text(record, "completed_at"), text(record, "completed_deadline_at"),
-                text(record, "deadline_time"));
+                text(record, "deadline_time"), record.optBoolean("reminder_sound", true));
     }
 
     private static String text(JSONObject record, String key) {

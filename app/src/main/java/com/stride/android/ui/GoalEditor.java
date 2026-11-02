@@ -58,6 +58,7 @@ final class GoalEditor {
         targetDate = original == null ? "" : original.targetDate;
         targetTime = original == null ? "" : original.deadlineTime;
         if (binding != null) {
+            binding.reminderSoundSwitch.setChecked(original == null || original.reminderSound);
             binding.titleInput.setText(original == null ? "" : original.title);
             binding.notesInput.setText(original == null ? "" : original.notes);
             binding.targetInput.setText(numberText(original == null ? 100 : original.target));
@@ -246,7 +247,7 @@ final class GoalEditor {
         Goal draft = new Goal(original == null ? "" : original.id, title,
                 binding.notesInput.getText().toString().trim(), target,
                 original == null ? 0 : original.current,
-                "%", targetDate, targetTime);
+                "%", targetDate, targetTime, binding.reminderSoundSwitch.isChecked());
         setSaving(true);
         viewModel.save(draft, saveResult);
     }
@@ -281,6 +282,7 @@ final class GoalEditor {
             binding.titleInput.setEnabled(!saving);
             binding.notesInput.setEnabled(!saving);
             binding.targetInput.setEnabled(!saving);
+            binding.reminderSoundSwitch.setEnabled(!saving);
             binding.dateButton.setEnabled(!saving);
             binding.clearDateButton.setEnabled(!saving);
             binding.timeButton.setEnabled(!saving && !targetDate.isEmpty());

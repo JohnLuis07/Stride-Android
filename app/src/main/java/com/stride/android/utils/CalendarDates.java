@@ -101,7 +101,7 @@ public final class CalendarDates {
                 ? previousTimezone : TimeZone.getDefault().getID();
     }
 
-    private static long deadlineMillis(String dateKey, String deadlineTime, String deadlineAt) {
+    public static long deadlineMillis(String dateKey, String deadlineTime, String deadlineAt) {
         if (!deadlineAt.isEmpty()) {
             return timestampMillis(deadlineAt);
         }

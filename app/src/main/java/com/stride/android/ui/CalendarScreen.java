@@ -26,6 +26,7 @@ import org.json.JSONObject;
 public final class CalendarScreen implements FeatureScreen {
     private final ComponentActivity activity;
     private final ScreenCalendarBinding binding;
+    private final LoadingView loadingView;
     private final CalendarViewModel viewModel;
     private final Observer<CalendarState> observer = this::render;
     private CalendarHeaderAdapter headerAdapter;
@@ -41,11 +42,12 @@ public final class CalendarScreen implements FeatureScreen {
         viewModel = new ViewModelProvider(activity).get(
                 "calendar:" + user.optString("id"), CalendarViewModel.class);
         viewModel.configure(api, user.optString("id"));
+        loadingView = new LoadingView(activity, binding.getRoot(), viewModel::reload);
     }
 
     @Override
     public View root() {
-        return binding.getRoot();
+        return loadingView.root();
     }
 
     public void bind() {
@@ -96,6 +98,7 @@ public final class CalendarScreen implements FeatureScreen {
                 eventAdapter.notifyItemRangeChanged(0, eventAdapter.getItemCount());
             }
         });
+        loadingView.update(true, false);
         viewModel.reload();
     }
 
@@ -104,8 +107,15 @@ public final class CalendarScreen implements FeatureScreen {
             return;
         }
         headerAdapter.submitState(state);
+        if (state.loading || state.loadFailed) {
+            loadingView.update(state.loading, state.loadFailed);
+        }
         eventAdapter.setBusy(state.saving);
-        eventAdapter.submitList(state.agenda);
+        eventAdapter.submitList(state.agenda, () -> {
+            if (!closed && viewModel.state().getValue() == state) {
+                loadingView.update(state.loading, state.loadFailed);
+            }
+        });
     }
 
     private void showEditor(CalendarEvent event) {

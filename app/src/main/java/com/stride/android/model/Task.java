@@ -15,6 +15,7 @@ public final class Task {
     public final String completedAt;
     public final String completedDeadlineAt;
     public final String deadlineTime;
+    public final boolean reminderSound;
 
     public Task(String id, String title, String details, String dueDate, String priority, String status) {
         this(id, title, details, dueDate, priority, status, "");
@@ -22,12 +23,17 @@ public final class Task {
 
     public Task(String id, String title, String details, String dueDate, String priority,
             String status, String deadlineTime) {
-        this(id, title, details, dueDate, priority, status, "", "", "", "", deadlineTime);
+        this(id, title, details, dueDate, priority, status, deadlineTime, true);
+    }
+
+    public Task(String id, String title, String details, String dueDate, String priority,
+            String status, String deadlineTime, boolean reminderSound) {
+        this(id, title, details, dueDate, priority, status, "", "", "", "", deadlineTime, reminderSound);
     }
 
     private Task(String id, String title, String details, String dueDate, String priority, String status,
             String deadlineTimezone, String deadlineAt, String completedAt, String completedDeadlineAt,
-            String deadlineTime) {
+            String deadlineTime, boolean reminderSound) {
         this.id = id;
         this.title = title;
         this.details = details;
@@ -39,6 +45,7 @@ public final class Task {
         this.completedAt = completedAt;
         this.completedDeadlineAt = completedDeadlineAt;
         this.deadlineTime = deadlineTime;
+        this.reminderSound = reminderSound;
     }
 
     public static Task fromJson(JSONObject record) {
@@ -48,7 +55,7 @@ public final class Task {
                 text(record, "due_date"), priority.isEmpty() ? "Medium" : priority,
                 status.isEmpty() ? "todo" : status, text(record, "deadline_timezone"),
                 text(record, "deadline_at"), text(record, "completed_at"), text(record, "completed_deadline_at"),
-                text(record, "deadline_time"));
+                text(record, "deadline_time"), record.optBoolean("reminder_sound", true));
     }
 
     private static String text(JSONObject record, String key) {

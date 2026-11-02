@@ -1,5 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="carousel_budget_label">Make every amount count</string>
+    <string name="carousel_budget_title">Stay on top of your budget.</string>
+    <string name="carousel_budget_description">Track your allowance, plan expenses, and see what is left.</string>
+    <string name="carousel_open_budget">Open budget</string>
+    <string name="workspace_loading_title">Getting things ready</string>
+    <string name="workspace_loading_message">Loading your data. Just a moment.</string>
+    <string name="workspace_loading_session">Opening Stride</string>
+    <string name="workspace_loading_session_message">Restoring your secure session.</string>
+    <string name="workspace_loading_signin">Signing you in</string>
+    <string name="workspace_loading_signin_message">Securely connecting to your workspace.</string>
+    <string name="workspace_loading_welcome">Welcome to Stride</string>
+    <string name="workspace_loading_welcome_message">Preparing your workspace.</string>
+    <string name="workspace_loading_signup">Creating your account</string>
+    <string name="workspace_loading_signup_message">Getting your Stride account ready.</string>
+    <string name="workspace_loading_failed_title">Unable to load your data</string>
+    <string name="workspace_loading_failed_message">Please check your connection and try again.</string>
+    <string name="workspace_loading_retry">Try again</string>
+    <string name="tasks_sort_button">Sort ▾</string>
+    <string name="tasks_sort_description">Sort tasks. Current order: %1$s</string>
+    <string name="tasks_refresh_compact">Refresh</string>
+    <string name="tasks_sort_newest">Newest first</string>
+    <string name="tasks_sort_deadline">Closest deadline</string>
     <string name="app_name">Stride</string>
     <string name="stride_logo">Stride logo</string>
     <string name="google_continue">Continue with Google</string>
@@ -15,4 +37,23 @@
     <string name="google_session_expired">Your session expired. Please sign in again.</string>
     <string name="google_session_storage_failed">Could not securely save your session. Please try signing in again.</string>
     <string name="google_email_managed">Your Google account manages your email address. Keep that email when saving your profile.</string>
+    <string name="reminder_channel">Task and goal deadlines</string>
+    <string name="reminder_task">Task reminder</string>
+    <string name="reminder_goal">Goal reminder</string>
+    <string name="reminder_day">%1$s is due within 24 hours.</string>
+    <string name="reminder_hour">%1$s is due within 1 hour.</string>
+    <string name="reminder_minutes">%1$s is due within 5 minutes.</string>
+    <string name="reminder_overdue">%1$s is overdue.</string>
+    <string name="reminder_timing_title">Allow timely deadline reminders</string>
+    <string name="reminder_timing_message">Allow Stride to schedule alarms so enabled deadline alarms can ring on time. Without this access, deadline alarms cannot ring and Android may delay silent reminders.</string>
+    <string name="reminder_allow">Open settings</string>
+    <string name="reminder_later">Later</string>
+    <string name="reminder_sound_label">Ring alarm at deadline</string>
+    <string name="reminder_sound_help">Rings at the deadline until dismissed. Earlier reminders are silent. Requires Alarms &amp; reminders access and audible alarm volume.</string>
+    <string name="deadline_alarm_channel">Ringing deadline alarms</string>
+    <string name="deadline_alarm_title">Deadline alarm</string>
+    <string name="deadline_alarm_due">%1$s has reached its deadline.</string>
+    <string name="deadline_alarm_dismiss">Dismiss</string>
+    <string name="deadline_alarm_dismiss_all">Dismiss alarms</string>
+    <string name="reminder_silent_channel">Silent task and goal deadlines</string>
 </resources>

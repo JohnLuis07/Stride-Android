@@ -13,6 +13,7 @@ import com.stride.android.viewmodel.SessionViewModel;
 /** Owns authentication form binding, validation, and user feedback. */
 public final class LoginScreen implements FeatureScreen {
     private final ActivityLoginBinding binding;
+    private final LoadingView loadingView;
     private final SessionViewModel session;
     private final FeatureUi ui;
     private final Activity activity;
@@ -25,6 +26,8 @@ public final class LoginScreen implements FeatureScreen {
     public LoginScreen(Activity activity, SessionViewModel session) {
         this.activity = activity;
         binding = ActivityLoginBinding.inflate(activity.getLayoutInflater());
+        loadingView = new LoadingView(activity, binding.getRoot(), null);
+        loadingView.showContent();
         this.session = session;
         ui = new FeatureUi(activity);
         google = new GoogleSignIn(activity);
@@ -32,7 +35,7 @@ public final class LoginScreen implements FeatureScreen {
 
     @Override
     public View root() {
-        return binding.getRoot();
+        return loadingView.root();
     }
 
     @Override
@@ -111,6 +114,11 @@ public final class LoginScreen implements FeatureScreen {
 
     private void setBusy(boolean value, boolean googleRequest) {
         busy = value;
+        if (value) {
+            loadingView.showLoading(R.string.workspace_loading_signin, R.string.workspace_loading_signin_message);
+        } else {
+            loadingView.showContent();
+        }
         binding.signInButton.setEnabled(!value);
         binding.googleSignInButton.setEnabled(!value);
         binding.createAccountButton.setEnabled(!value);

@@ -95,33 +95,87 @@ grant usage on schema public to authenticated;
 grant select, update on public.users to authenticated;
 grant select, insert, update, delete on public.notes, public.tasks, public.goals, public.calendar_events to authenticated;
 
+-- Shared provisioning for verified sign-in and the optional confirmation trigger.
+-- Kept private: application roles must go through the authenticated resolver.
+create or replace function stride_auth.provision_verified_profile(target_auth_user_id uuid)
+returns uuid language plpgsql security definer set search_path = '' as $function$
+declare profile uuid; verified_email text; display_name text;
+begin
+    if target_auth_user_id is null then
+        raise exception 'STRIDE_SESSION_EXPIRED' using errcode = '42501';
+    end if;
+    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(target_auth_user_id::text, 0));
+    select u.email, coalesce(nullif(btrim(u.raw_user_meta_data ->> 'full_name'),''),
+            nullif(btrim(u.raw_user_meta_data ->> 'name'),''), split_part(u.email,'@',1))
+        into verified_email, display_name from auth.users u
+        where u.id = target_auth_user_id and u.email_confirmed_at is not null and nullif(btrim(u.email),'') is not null;
+    if verified_email is null then
+        raise exception 'STRIDE_EMAIL_UNCONFIRMED' using errcode = '42501';
+    end if;
+    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(lower(verified_email), 1));
+    select a.profile_id into profile from stride_auth.account_profiles a where a.auth_user_id = target_auth_user_id;
+    if profile is not null then return profile; end if;
+
+    -- Another signup integration may have inserted the canonical profile first.
+    -- Recover only an exact Auth ID AND verified-email match, never email alone.
+    select u.id into profile from public.users u
+        where u.id = target_auth_user_id and lower(u.email) = lower(verified_email)
+        for update;
+    if profile is not null then
+        if exists (select 1 from stride_auth.account_profiles a where a.profile_id = profile)
+            or exists (select 1 from public.users u
+                where lower(u.email) = lower(verified_email) and u.id <> profile) then
+            return null;
+        end if;
+        -- Do not overwrite an association established concurrently by an administrator.
+        insert into stride_auth.account_profiles(auth_user_id,profile_id)
+            values(target_auth_user_id,profile) on conflict do nothing;
+        if exists (select 1 from stride_auth.account_profiles a
+            where a.auth_user_id = target_auth_user_id and a.profile_id = profile) then
+            return profile;
+        end if;
+        return null;
+    end if;
+    if exists (select 1 from public.users u where lower(u.email) = lower(verified_email) or u.id = target_auth_user_id) then
+        -- A collision is a legacy-account review, never evidence to claim that profile.
+        return null;
+    end if;
+    -- Populate the actual column type: a JSON array becomes text[], json/jsonb,
+    -- or JSON text as required by the existing public.users.features definition.
+    insert into public.users(id, full_name, email, password, features)
+        select p.id, p.full_name, p.email, p.password, p.features
+        from pg_catalog.jsonb_populate_record(null::public.users, pg_catalog.jsonb_build_object(
+            'id',target_auth_user_id, 'full_name',display_name, 'email',verified_email,
+            'password',replace(pg_catalog.gen_random_uuid()::text,'-',''),
+            'features',pg_catalog.jsonb_build_array('Todo','Calendar','Notes','Goals','Focus')
+        )) as p;
+    insert into stride_auth.account_profiles(auth_user_id,profile_id) values(target_auth_user_id,target_auth_user_id);
+    return target_auth_user_id;
+end;
+$function$;
+revoke all on function stride_auth.provision_verified_profile(uuid) from public, anon, authenticated, service_role;
+
 create or replace function public.resolve_profile()
 returns jsonb language plpgsql security definer set search_path = '' as $function$
-declare caller uuid := auth.uid(); profile uuid; verified_email text; display_name text; result jsonb;
+declare caller uuid := auth.uid(); profile uuid; verified_email text; signup_name text; result jsonb;
 begin
     if caller is null or auth.role() <> 'authenticated' then
         raise exception 'STRIDE_SESSION_EXPIRED' using errcode = '42501';
     end if;
-    select u.email, coalesce(nullif(u.raw_user_meta_data ->> 'full_name',''), split_part(u.email,'@',1))
-        into verified_email, display_name from auth.users u
-        where u.id = caller and u.email_confirmed_at is not null;
-    if verified_email is null then
-        raise exception 'STRIDE_EMAIL_UNCONFIRMED' using errcode = '42501';
-    end if;
-    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(caller::text, 0));
-    perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended(lower(verified_email), 1));
-    select a.profile_id into profile from stride_auth.account_profiles a where a.auth_user_id = caller;
+    profile := stride_auth.provision_verified_profile(caller);
     if profile is null then
-        if exists (select 1 from public.users u where lower(u.email) = lower(verified_email) or u.id = caller) then
-            raise exception 'STRIDE_ACCOUNT_LINK_REQUIRED';
-        end if;
-        insert into public.users(id, full_name, email, password, features)
-            values(caller, display_name, verified_email, replace(pg_catalog.gen_random_uuid()::text,'-',''),
-                '["Todo","Calendar","Notes","Goals","Focus"]');
-        insert into stride_auth.account_profiles(auth_user_id,profile_id) values(caller,caller);
-        profile := caller;
+        raise exception 'STRIDE_ACCOUNT_LINK_REQUIRED';
     end if;
+    select u.email, coalesce(nullif(btrim(u.raw_user_meta_data ->> 'full_name'), ''),
+            nullif(btrim(u.raw_user_meta_data ->> 'name'), ''))
+        into verified_email, signup_name from auth.users u
+        where u.id = caller and u.email_confirmed_at is not null;
+    if verified_email is null then raise exception 'STRIDE_EMAIL_UNCONFIRMED' using errcode = '42501'; end if;
     update public.users set email = verified_email where id = profile and email is distinct from verified_email;
+    -- Repair a missing name only on the verified caller's resolved profile.
+    -- Preserve names already saved in Stride, even if Auth metadata differs.
+    update public.users set full_name = signup_name
+        where id = profile and nullif(btrim(full_name), '') is null and signup_name is not null;
     select jsonb_build_object('id',u.id,'full_name',u.full_name,'email',u.email,
         'features',coalesce(to_jsonb(u.features),'["Todo","Calendar","Notes","Goals","Focus"]'::jsonb))
         into result from public.users u where u.id = profile;

@@ -12,6 +12,7 @@ import com.stride.android.viewmodel.SessionViewModel;
 /** Owns authentication form binding, validation, and user feedback. */
 public final class SignupScreen implements FeatureScreen {
     private final ActivitySignupBinding binding;
+    private final LoadingView loadingView;
     private final SessionViewModel session;
     private final FeatureUi ui;
     private boolean closed;
@@ -22,13 +23,15 @@ public final class SignupScreen implements FeatureScreen {
     public SignupScreen(Activity activity, SessionViewModel session) {
         this.activity = activity;
         binding = ActivitySignupBinding.inflate(activity.getLayoutInflater());
+        loadingView = new LoadingView(activity, binding.getRoot(), null);
+        loadingView.showContent();
         this.session = session;
         ui = new FeatureUi(activity);
     }
 
     @Override
     public View root() {
-        return binding.getRoot();
+        return loadingView.root();
     }
 
     @Override
@@ -81,6 +84,11 @@ public final class SignupScreen implements FeatureScreen {
 
     private void setBusy(boolean value) {
         busy = value;
+        if (value) {
+            loadingView.showLoading(R.string.workspace_loading_signup, R.string.workspace_loading_signup_message);
+        } else {
+            loadingView.showContent();
+        }
         binding.createAccountButton.setEnabled(!value);
         binding.backToSignInButton.setEnabled(!value);
         binding.nameInput.setEnabled(!value);

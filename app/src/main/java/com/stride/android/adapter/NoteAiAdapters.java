@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -102,16 +103,63 @@ public final class NoteAiAdapters {
     }
 
     public static final class Messages extends Rows<NoteAiState.Message, ItemNoteAiMessageBinding> {
+        private static final Object ANSWER_CHANGED = new Object();
         private final Consumer<NoteAiState.Citation> open;
         public Messages(Consumer<NoteAiState.Citation> open) {
             super((inflater, parent) -> ItemNoteAiMessageBinding.inflate(inflater, parent, false)); this.open = open;
         }
+        @Override public void submit(List<NoteAiState.Message> values) {
+            List<NoteAiState.Message> previous = new ArrayList<>(items);
+            List<NoteAiState.Message> next = new ArrayList<>(values);
+            DiffUtil.DiffResult changes = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override public int getOldListSize() { return previous.size(); }
+                @Override public int getNewListSize() { return next.size(); }
+                @Override public boolean areItemsTheSame(int oldPosition, int newPosition) {
+                    return previous.get(oldPosition).id.equals(next.get(newPosition).id);
+                }
+                @Override public boolean areContentsTheSame(int oldPosition, int newPosition) {
+                    return previous.get(oldPosition) == next.get(newPosition);
+                }
+                @Override public Object getChangePayload(int oldPosition, int newPosition) {
+                    return previous.get(oldPosition).question.equals(next.get(newPosition).question) ? ANSWER_CHANGED : null;
+                }
+            }, false);
+            items.clear(); items.addAll(next);
+            changes.dispatchUpdatesTo(this);
+        }
+
+        @NonNull @Override public Holder<ItemNoteAiMessageBinding> onCreateViewHolder(@NonNull ViewGroup parent, int type) {
+            Holder<ItemNoteAiMessageBinding> holder = super.onCreateViewHolder(parent, type);
+            holder.binding.citationsList.setLayoutManager(new LinearLayoutManager(parent.getContext(), RecyclerView.HORIZONTAL, false));
+            holder.binding.citationsList.setAdapter(new Citations(open));
+            return holder;
+        }
+
+        @Override public void onBindViewHolder(@NonNull Holder<ItemNoteAiMessageBinding> holder, int position,
+                @NonNull List<Object> payloads) {
+            if (payloads.contains(ANSWER_CHANGED)) updateAnswer(holder.binding, items.get(position));
+            else super.onBindViewHolder(holder, position, payloads);
+        }
+
         @Override void bind(ItemNoteAiMessageBinding b, NoteAiState.Message value) {
-            b.question.setText(value.question); b.answer.setText(value.answer);
-            b.noCitations.setVisibility(value.citations.isEmpty() ? View.VISIBLE : View.GONE);
-            Citations adapter = new Citations(open);
-            b.citationsList.setLayoutManager(new LinearLayoutManager(b.getRoot().getContext(), RecyclerView.HORIZONTAL, false));
-            b.citationsList.setAdapter(adapter); adapter.submit(value.citations);
+            b.question.setText(value.question);
+            b.answer.setText(value.answer);
+            updateAnswer(b, value);
+        }
+
+        private void updateAnswer(ItemNoteAiMessageBinding b, NoteAiState.Message value) {
+            String previous = b.answer.getText().toString();
+            if (!previous.equals(value.answer)) {
+                if (value.answer.startsWith(previous)) b.answer.append(value.answer, previous.length(), value.answer.length());
+                else b.answer.setText(value.answer);
+            }
+            int footer = value.generating ? (value.answer.isEmpty() ? R.string.note_ai_thinking : R.string.note_ai_receiving)
+                    : value.incomplete ? R.string.note_ai_partial_answer : R.string.note_ai_no_citations;
+            b.noCitations.setText(footer);
+            b.noCitations.setVisibility(value.generating || value.incomplete || value.citations.isEmpty() ? View.VISIBLE : View.GONE);
+            boolean hasCitations = !value.generating && !value.incomplete && !value.citations.isEmpty();
+            b.citationsList.setVisibility(hasCitations ? View.VISIBLE : View.GONE);
+            if (hasCitations) ((Citations) b.citationsList.getAdapter()).submit(value.citations);
         }
     }
 

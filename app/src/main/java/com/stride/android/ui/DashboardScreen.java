@@ -19,6 +19,8 @@ import com.stride.android.adapter.FeatureCarouselAdapter;
 import com.stride.android.databinding.ScreenDashboardBinding;
 import com.stride.android.model.FeatureBanner;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -84,7 +86,7 @@ public final class DashboardScreen implements FeatureScreen, LifecycleEventObser
     }
 
     public void bind(Runnable notes, Runnable calendar, Runnable tasks,
-            Runnable goals, Runnable focus) {
+            Runnable goals, Runnable focus, Runnable videos, Runnable allowance) {
         String name = user.optString("full_name").trim();
         binding.pageTitle.setText(name.isEmpty()
                 ? activity.getString(R.string.workspace_welcome_default)
@@ -93,7 +95,18 @@ public final class DashboardScreen implements FeatureScreen, LifecycleEventObser
         String pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "EEE, MMM d");
         binding.dashboardDate.setText(new SimpleDateFormat(pattern, locale).format(new Date()));
 
-        String features = user.optString("features", "");
+        JSONArray features = user.optJSONArray("features");
+        if (features == null) {
+            try {
+                features = new JSONArray(user.optString("features", ""));
+            } catch (JSONException ignored) {
+                // Match Settings: absent or invalid preferences use the default selection.
+            }
+        }
+        bindTool(binding.allowanceCard, visible(features, "Allowance"), allowance,
+                R.string.allowance_title, R.string.allowance_description);
+        bindTool(binding.videosCard, com.stride.android.viewmodel.SessionViewModel.hasVideoFeature(user), videos,
+                R.string.video_title, R.string.video_description);
         bindTool(binding.tasksCard, visible(features, "Todo"), tasks,
                 R.string.workspace_open_tasks, R.string.workspace_tasks_description);
         bindTool(binding.calendarCard, visible(features, "Calendar"), calendar,
@@ -126,6 +139,12 @@ public final class DashboardScreen implements FeatureScreen, LifecycleEventObser
                 R.string.workspace_open_goals, R.drawable.ic_workspace_goals,
                 R.drawable.bg_carousel_goals));
 
+        addBanner(features, new FeatureBanner("Allowance", R.string.carousel_budget_label,
+                R.string.carousel_budget_title, R.string.carousel_budget_description,
+                R.string.carousel_open_budget, R.drawable.ic_workspace_allowance,
+                R.drawable.bg_allowance_header));
+
+        binding.featureCarouselCard.setVisibility(banners.isEmpty() ? View.GONE : View.VISIBLE);
         binding.featureCarousel.setAdapter(new FeatureCarouselAdapter(banners, banner -> {
             switch (banner.feature) {
                 case "Todo":
@@ -142,6 +161,9 @@ public final class DashboardScreen implements FeatureScreen, LifecycleEventObser
                     break;
                 case "Focus":
                     focus.run();
+                    break;
+                case "Allowance":
+                    allowance.run();
                     break;
             }
         }));
@@ -168,8 +190,8 @@ public final class DashboardScreen implements FeatureScreen, LifecycleEventObser
         scheduleRotation();
     }
 
-    private void addBanner(String features, FeatureBanner banner) {
-        if ("Focus".equals(banner.feature) || visible(features, banner.feature)) {
+    private void addBanner(JSONArray features, FeatureBanner banner) {
+        if (visible(features, banner.feature)) {
             banners.add(banner);
         }
     }
@@ -181,7 +203,7 @@ public final class DashboardScreen implements FeatureScreen, LifecycleEventObser
         FeatureBanner banner = banners.get(position);
         binding.featureCarouselCard.setBackgroundResource(banner.background);
         View[] dots = {binding.carouselDotOne, binding.carouselDotTwo, binding.carouselDotThree,
-                binding.carouselDotFour, binding.carouselDotFive};
+                binding.carouselDotFour, binding.carouselDotFive, binding.carouselDotSix};
         float density = activity.getResources().getDisplayMetrics().density;
         for (int i = 0; i < dots.length; i++) {
             dots[i].setVisibility(i < banners.size() ? View.VISIBLE : View.GONE);
@@ -264,7 +286,15 @@ public final class DashboardScreen implements FeatureScreen, LifecycleEventObser
         card.setOnClickListener(v -> open.run());
     }
 
-    private boolean visible(String features, String feature) {
-        return features.isEmpty() || features.contains(feature);
+    private boolean visible(JSONArray features, String feature) {
+        if (features == null) {
+            return true;
+        }
+        for (int i = 0; i < features.length(); i++) {
+            if (feature.equals(features.optString(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

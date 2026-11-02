@@ -1,7 +1,6 @@
 package com.stride.android.ui;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.util.Patterns;
 import android.view.View;
@@ -31,7 +30,6 @@ public final class SettingsScreen implements FeatureScreen {
     private boolean closed;
     private boolean savingProfile;
     private boolean savingFeatures;
-    private AlertDialog signOutDialog;
     private AuthVerificationDialog verification;
 
     public SettingsScreen(Activity activity, SessionViewModel session, Runnable signOut) {
@@ -231,19 +229,10 @@ public final class SettingsScreen implements FeatureScreen {
     }
 
     private void confirmSignOut() {
-        if (savingProfile || savingFeatures || (signOutDialog != null && signOutDialog.isShowing())) {
+        if (closed || savingProfile || savingFeatures) {
             return;
         }
-        signOutDialog = new AlertDialog.Builder(activity)
-                .setTitle(R.string.settings_sign_out_title)
-                .setMessage(R.string.settings_sign_out_message)
-                .setNegativeButton(R.string.settings_cancel, null)
-                .setPositiveButton(R.string.settings_sign_out, (dialog, which) -> {
-                    if (!closed) {
-                        signOut.run();
-                    }
-                })
-                .show();
+        signOut.run();
     }
 
     private void hideKeyboard() {
@@ -259,10 +248,6 @@ public final class SettingsScreen implements FeatureScreen {
     public void close() {
         closed = true;
         if (verification != null) verification.close();
-        if (signOutDialog != null) {
-            signOutDialog.dismiss();
-            signOutDialog = null;
-        }
         binding.featuresList.setAdapter(null);
     }
 }

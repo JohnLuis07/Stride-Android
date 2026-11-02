@@ -175,6 +175,12 @@
                         android:drawableStart="@drawable/ic_workspace_focus"
                         android:text="@string/workspace_focus" />
 
+                    <Button
+                        android:id="@+id/nav_allowance"
+                        style="@style/StrideWorkspaceNav"
+                        android:drawableStart="@drawable/ic_workspace_allowance"
+                        android:text="@string/allowance_title" />
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

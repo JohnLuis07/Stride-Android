@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.stride.android.R;
 import com.stride.android.adapter.NoteAiAdapters;
@@ -24,6 +25,9 @@ import com.stride.android.model.Note;
 import com.stride.android.model.NoteAiState;
 import com.stride.android.utils.SupabaseApi;
 import com.stride.android.viewmodel.NoteAiViewModel;
+
+import java.util.List;
+import java.util.Set;
 
 /** Source selection, grounded chat, and persistent study outputs for one saved note. */
 final class NoteAiWorkspace {
@@ -43,8 +47,13 @@ final class NoteAiWorkspace {
     private NoteAiStudyDialog study;
     private NoteAiPdfViewer pdf;
     private boolean closed;
-    private int messageCount;
+    private List<NoteAiState.Source> renderedSources;
+    private List<NoteAiState.Artifact> renderedArtifacts;
+    private Set<String> renderedSelection;
+    private boolean renderedBlocked, chatVisible;
+    private String lastMessageId = "", lastAnswer = "";
     private final Runnable poll = this::pollSources;
+    private final Runnable followAnswer = this::scrollChatToEnd;
 
     private void pollSources() { if (!closed) model.reload(); }
 
@@ -70,6 +79,11 @@ final class NoteAiWorkspace {
         binding.sourcesList.setAdapter(sources);
         binding.chatList.setLayoutManager(new LinearLayoutManager(activity));
         binding.chatList.setAdapter(messages);
+        binding.chatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override public void onScrollStateChanged(RecyclerView recycler, int state) {
+                if (state == RecyclerView.SCROLL_STATE_DRAGGING) recycler.removeCallbacks(followAnswer);
+            }
+        });
         binding.artifactsList.setLayoutManager(new LinearLayoutManager(activity));
         binding.artifactsList.setAdapter(artifacts);
         binding.sourcesList.setItemAnimator(null);
@@ -85,6 +99,7 @@ final class NoteAiWorkspace {
             closed = true;
             model.state().removeObserver(observer);
             main.removeCallbacksAndMessages(null);
+            binding.chatList.removeCallbacks(followAnswer);
             picker.unregister();
             binding.questionInput.removeTextChangedListener(questionWatcher);
             binding.sourcesList.setAdapter(null); binding.chatList.setAdapter(null); binding.artifactsList.setAdapter(null);
@@ -113,6 +128,8 @@ final class NoteAiWorkspace {
     private void render(NoteAiState state) {
         if (closed) return;
         boolean blocked = state.busy || state.loading;
+        boolean showingChat = "chat".equals(state.tab);
+        boolean following = !binding.chatList.canScrollVertically(1);
         binding.selectionText.setText(activity.getString(R.string.note_ai_selection, state.selectedSources.size()));
         binding.sourcesPanel.setVisibility("sources".equals(state.tab) ? View.VISIBLE : View.GONE);
         binding.chatPanel.setVisibility("chat".equals(state.tab) ? View.VISIBLE : View.GONE);
@@ -135,15 +152,56 @@ final class NoteAiWorkspace {
             binding.questionInput.setText(state.question);
             binding.questionInput.setSelection(binding.questionInput.length());
         }
-        sources.update(state); messages.submit(state.messages); artifacts.submit(state.artifacts);
+        if (renderedSources == null || !renderedSources.equals(state.sources)
+                || !renderedSelection.equals(state.selectedSources) || renderedBlocked != blocked) {
+            sources.update(state);
+            renderedSources = state.sources;
+            renderedSelection = state.selectedSources;
+            renderedBlocked = blocked;
+        }
+        messages.submit(state.messages);
+        if (renderedArtifacts == null || !renderedArtifacts.equals(state.artifacts)) {
+            artifacts.submit(state.artifacts);
+            renderedArtifacts = state.artifacts;
+        }
         binding.sourcesEmpty.setVisibility(state.sources.isEmpty() && !state.loading ? View.VISIBLE : View.GONE);
         binding.chatEmpty.setVisibility(state.messages.isEmpty() ? View.VISIBLE : View.GONE);
         binding.studyEmpty.setVisibility(state.artifacts.isEmpty() ? View.VISIBLE : View.GONE);
-        if (state.messages.size() > messageCount) binding.chatList.scrollToPosition(state.messages.size() - 1);
-        messageCount = state.messages.size();
+        NoteAiState.Message latest = state.messages.isEmpty() ? null : state.messages.get(state.messages.size() - 1);
+        String latestId = latest == null ? "" : latest.id;
+        String latestAnswer = latest == null ? "" : latest.answer;
+        boolean newMessage = !lastMessageId.equals(latestId);
+        boolean answerChanged = !lastAnswer.equals(latestAnswer);
+        if (showingChat && latest != null && (newMessage || !chatVisible || (answerChanged && following))) {
+            binding.chatList.removeCallbacks(followAnswer);
+            binding.chatList.postOnAnimation(followAnswer);
+        }
+        if (!showingChat) binding.chatList.removeCallbacks(followAnswer);
+        chatVisible = showingChat;
+        lastMessageId = latestId;
+        lastAnswer = latestAnswer;
         main.removeCallbacks(poll);
         if (!blocked && state.errorResource == 0) for (NoteAiState.Source source : state.sources) {
             if ("indexing".equals(source.status)) { main.postDelayed(poll, 6000); break; }
+        }
+    }
+
+    private void scrollChatToEnd() {
+        if (closed || binding.chatPanel.getVisibility() != View.VISIBLE || messages.getItemCount() == 0) return;
+        if (binding.chatList.isLayoutRequested() || binding.chatList.hasPendingAdapterUpdates()) {
+            binding.chatList.postOnAnimation(followAnswer);
+            return;
+        }
+        LinearLayoutManager manager = (LinearLayoutManager) binding.chatList.getLayoutManager();
+        int last = messages.getItemCount() - 1;
+        View row = manager.findViewByPosition(last);
+        if (row == null) {
+            binding.chatList.scrollToPosition(last);
+            binding.chatList.postOnAnimation(followAnswer);
+        } else {
+            int bottom = manager.getDecoratedBottom(row);
+            int viewport = binding.chatList.getHeight() - binding.chatList.getPaddingBottom();
+            if (bottom > viewport) binding.chatList.scrollBy(0, bottom - viewport);
         }
     }
 

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
@@ -28,8 +29,12 @@ import java.text.NumberFormat;
 
 /** Task workspace with a scrolling overview and binding-backed task cards. */
 public final class TasksScreen implements FeatureScreen {
+    private static final int MENU_SORT_NEWEST = 1;
+    private static final int MENU_SORT_DEADLINE = 2;
+
     private final ComponentActivity activity;
     private final ScreenTasksBinding binding;
+    private final LoadingView loadingView;
     private final TasksViewModel viewModel;
     private final Observer<TasksState> observer = this::render;
     private final View.OnLayoutChangeListener contentSizeListener =
@@ -38,6 +43,7 @@ public final class TasksScreen implements FeatureScreen {
     private TaskAdapter taskAdapter;
     private TaskEditor editor;
     private AlertDialog confirmation;
+    private PopupMenu sortMenu;
     private CalendarDates.DateObserver dateObserver;
     private boolean closed;
     private final TasksViewModel.Result statusResult = new TasksViewModel.Result() {
@@ -62,11 +68,12 @@ public final class TasksScreen implements FeatureScreen {
         viewModel = new ViewModelProvider(activity).get(
                 "tasks:" + user.optString("id"), TasksViewModel.class);
         viewModel.configure(api, user.optString("id"));
+        loadingView = new LoadingView(activity, binding.getRoot(), viewModel::reload);
     }
 
     @Override
     public View root() {
-        return binding.getRoot();
+        return loadingView.root();
     }
 
     public void bind() {
@@ -77,6 +84,7 @@ public final class TasksScreen implements FeatureScreen {
         header.filterTodo.setOnClickListener(v -> viewModel.setFilter("todo"));
         header.filterDoing.setOnClickListener(v -> viewModel.setFilter("doing"));
         header.filterDone.setOnClickListener(v -> viewModel.setFilter("done"));
+        header.sortButton.setOnClickListener(v -> showSortMenu());
         taskAdapter = new TaskAdapter(new TaskAdapter.Actions() {
             @Override
             public void onEdit(Task task) {
@@ -112,6 +120,7 @@ public final class TasksScreen implements FeatureScreen {
                 taskAdapter.notifyItemRangeChanged(0, taskAdapter.getItemCount());
             }
         });
+        loadingView.update(true, false);
         viewModel.reload();
     }
 
@@ -120,8 +129,15 @@ public final class TasksScreen implements FeatureScreen {
             return;
         }
         renderOverview(state);
+        if (state.loading || state.loadFailed) {
+            loadingView.update(state.loading, state.loadFailed);
+        }
         taskAdapter.setBusy(state.saving || state.loading);
-        taskAdapter.submitList(state.visibleTasks);
+        taskAdapter.submitList(state.visibleTasks, () -> {
+            if (!closed && viewModel.state().getValue() == state) {
+                loadingView.update(state.loading, state.loadFailed);
+            }
+        });
         binding.tasksContent.setVisibility(state.visibleTasks.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
@@ -139,11 +155,14 @@ public final class TasksScreen implements FeatureScreen {
         header.completionProgress.setContentDescription(header.progressLabel.getText());
         header.addButton.setEnabled(!state.saving && !state.loading);
         header.refreshButton.setEnabled(!state.saving && !state.loading);
-        header.refreshButton.setText(state.loadFailed ? R.string.tasks_retry : R.string.tasks_refresh);
+        header.refreshButton.setText(state.loadFailed ? R.string.tasks_retry : R.string.tasks_refresh_compact);
         renderFilter(header.filterAll, "all".equals(state.filter));
         renderFilter(header.filterTodo, "todo".equals(state.filter));
         renderFilter(header.filterDoing, "doing".equals(state.filter));
         renderFilter(header.filterDone, "done".equals(state.filter));
+        header.sortButton.setContentDescription(activity.getString(R.string.tasks_sort_description,
+                activity.getString(TasksState.SORT_DEADLINE.equals(state.sort)
+                        ? R.string.tasks_sort_deadline : R.string.tasks_sort_newest)));
         header.resultCount.setText(activity.getString(R.string.tasks_visible_count, state.visibleTasks.size()));
         header.loadingProgress.setVisibility(state.loading || state.saving ? View.VISIBLE : View.GONE);
         boolean feedback = state.loading || state.saving || state.loadFailed;
@@ -156,6 +175,28 @@ public final class TasksScreen implements FeatureScreen {
         boolean freshStart = state.total == 0 && "all".equals(state.filter);
         header.emptyTitle.setText(freshStart ? R.string.tasks_empty_title : R.string.tasks_filter_empty_title);
         header.emptyMessage.setText(freshStart ? R.string.tasks_empty_message : R.string.tasks_filter_empty_message);
+    }
+
+    private void showSortMenu() {
+        TasksState state = viewModel.state().getValue();
+        if (closed || state == null || sortMenu != null) {
+            return;
+        }
+        sortMenu = new PopupMenu(activity, binding.tasksHeader.sortButton);
+        sortMenu.getMenu().add(0, MENU_SORT_NEWEST, 0, R.string.tasks_sort_newest);
+        sortMenu.getMenu().add(0, MENU_SORT_DEADLINE, 1, R.string.tasks_sort_deadline);
+        sortMenu.getMenu().setGroupCheckable(0, true, true);
+        sortMenu.getMenu().findItem(TasksState.SORT_DEADLINE.equals(state.sort)
+                ? MENU_SORT_DEADLINE : MENU_SORT_NEWEST).setChecked(true);
+        sortMenu.setOnMenuItemClickListener(item -> {
+            if (!closed) {
+                viewModel.setSort(item.getItemId() == MENU_SORT_DEADLINE
+                        ? TasksState.SORT_DEADLINE : TasksState.SORT_NEWEST);
+            }
+            return true;
+        });
+        sortMenu.setOnDismissListener(menu -> sortMenu = null);
+        sortMenu.show();
     }
 
     private void renderFilter(Button button, boolean selected) {
@@ -258,6 +299,9 @@ public final class TasksScreen implements FeatureScreen {
             return;
         }
         closed = true;
+        if (sortMenu != null) {
+            sortMenu.dismiss();
+        }
         if (dateObserver != null) {
             dateObserver.close();
         }

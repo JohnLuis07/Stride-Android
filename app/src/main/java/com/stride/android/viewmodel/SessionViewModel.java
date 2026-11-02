@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.stride.android.R;
 import com.stride.android.utils.FeatureUi;
+import com.stride.android.utils.DeadlineReminders;
 import com.stride.android.utils.GoogleSignIn;
 import com.stride.android.utils.SupabaseApi;
 
@@ -102,6 +103,9 @@ public final class SessionViewModel extends AndroidViewModel {
                 result.done(authError(error == null ? "STRIDE_PROFILE_UNAVAILABLE" : error));
             } else {
                 user = profile;
+                DeadlineReminders reminders = DeadlineReminders.get(getApplication());
+                reminders.activate(profile.optString("id"));
+                reminders.refresh(api, profile.optString("id"));
                 preferences.edit().remove("userEmail").apply();
                 result.done(null);
             }
@@ -252,12 +256,31 @@ public final class SessionViewModel extends AndroidViewModel {
             return;
         }
         int request = generation;
+        // This protected entitlement is managed by an administrator, never by the settings toggles.
+        JSONArray savedFeatures = new JSONArray();
+        for (int i = 0; i < features.length(); i++) {
+            if (!"generatevids".equals(features.optString(i))) savedFeatures.put(features.opt(i));
+        }
+        if (hasVideoFeature(user)) savedFeatures.put("generatevids");
         api.update("users", SupabaseApi.eq("id", user.optString("id")),
-                FeatureUi.obj("features", features), (rows, error) -> {
+                FeatureUi.obj("features", savedFeatures), (rows, error) -> {
                     if (request != generation) return;
-                    if (error == null && rows.length() == 1) merge(FeatureUi.obj("features", features));
+                    if (error == null && rows.length() == 1) merge(FeatureUi.obj("features", savedFeatures));
                     result.done(error);
                 });
+    }
+
+    public static boolean hasVideoFeature(JSONObject profile) {
+        if (profile == null) return false;
+        JSONArray values = profile.optJSONArray("features");
+        if (values == null) {
+            try { values = new JSONArray(profile.optString("features")); }
+            catch (JSONException ignored) { return false; }
+        }
+        for (int i = 0; i < values.length(); i++) {
+            if ("generatevids".equals(values.optString(i))) return true;
+        }
+        return false;
     }
 
     private void merge(JSONObject changes) {
@@ -272,6 +295,7 @@ public final class SessionViewModel extends AndroidViewModel {
 
     public void signOut() {
         generation++;
+        DeadlineReminders.get(getApplication()).clear();
         boolean googleSession = api.isGoogleSession();
         user = null;
         api.signOutGoogle();

@@ -19,17 +19,17 @@ import org.json.JSONArray;
 
 /** Owns the temporary selection until dashboard preferences are saved. */
 public final class SettingsFeatureAdapter extends RecyclerView.Adapter<SettingsFeatureAdapter.Holder> {
-    private static final String[] KEYS = {"Notes", "Calendar", "Todo", "Goals", "Focus"};
+    private static final String[] KEYS = {"Notes", "Calendar", "Todo", "Goals", "Focus", "Allowance"};
     private static final int[] TITLES = {R.string.settings_notes, R.string.settings_calendar,
-            R.string.settings_tasks, R.string.settings_goals, R.string.settings_focus};
+            R.string.settings_tasks, R.string.settings_goals, R.string.settings_focus, R.string.allowance_title};
     private static final int[] DESCRIPTIONS = {R.string.settings_notes_hint, R.string.settings_calendar_hint,
-            R.string.settings_tasks_hint, R.string.settings_goals_hint, R.string.settings_focus_hint};
+            R.string.settings_tasks_hint, R.string.settings_goals_hint, R.string.settings_focus_hint, R.string.allowance_description};
     private static final int[] ICONS = {R.drawable.ic_workspace_notes, R.drawable.ic_workspace_calendar,
-            R.drawable.ic_workspace_tasks, R.drawable.ic_workspace_goals, R.drawable.ic_workspace_focus};
+            R.drawable.ic_workspace_tasks, R.drawable.ic_workspace_goals, R.drawable.ic_workspace_focus, R.drawable.ic_workspace_allowance};
     private static final int[] BACKGROUNDS = {R.drawable.bg_workspace_notes_icon, R.drawable.bg_workspace_calendar_icon,
-            R.drawable.bg_workspace_tasks_icon, R.drawable.bg_workspace_goals_icon, R.drawable.bg_workspace_avatar};
+            R.drawable.bg_workspace_tasks_icon, R.drawable.bg_workspace_goals_icon, R.drawable.bg_workspace_avatar, R.drawable.bg_workspace_tasks_icon};
     private static final int[] COLORS = {R.color.workspace_notes, R.color.workspace_calendar,
-            R.color.workspace_tasks, R.color.workspace_goals, R.color.workspace_accent};
+            R.color.workspace_tasks, R.color.workspace_goals, R.color.workspace_accent, R.color.allowance_accent};
     private final boolean[] selected = new boolean[KEYS.length];
     private final Runnable onSelectionChanged;
     private boolean enabled = true;

@@ -81,6 +81,18 @@
             android:layout_gravity="end"
             android:layout_marginTop="8dp"
             android:text="@string/goals_clear_time" />
+        <Switch
+            android:id="@+id/reminder_sound_switch"
+            style="@style/StrideGoalLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/reminder_sound_label"
+            android:checked="true" />
+        <TextView
+            style="@style/StrideGoalLabel"
+            android:text="@string/reminder_sound_help" />
+
         <TextView
             android:id="@+id/form_error"
             android:layout_width="match_parent"

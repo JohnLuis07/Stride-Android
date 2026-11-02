@@ -120,6 +120,14 @@
                         android:layout_marginEnd="6dp"
                         android:background="@drawable/bg_carousel_dot"
                         android:importantForAccessibility="no" />
+
+                    <View
+                        android:id="@+id/carousel_dot_six"
+                        android:layout_width="6dp"
+                        android:layout_height="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_carousel_dot"
+                        android:importantForAccessibility="no" />
                 </LinearLayout>
 
                 <TextView
@@ -129,7 +137,7 @@
                     android:layout_marginEnd="8dp"
                     android:textColor="@color/workspace_focus_secondary"
                     android:textSize="11sp"
-                    tools:text="1 / 5" />
+                    tools:text="1 / 6" />
 
                 <Button
                     android:id="@+id/carousel_playback"
@@ -321,6 +329,33 @@
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_workspace_arrow"
                     android:tint="@color/workspace_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/allowance_card"
+                style="@style/StrideWorkspaceTool" android:visibility="gone">
+                <ImageView style="@style/StrideWorkspaceToolIcon" android:background="@drawable/bg_workspace_tasks_icon"
+                    android:src="@drawable/ic_workspace_allowance" android:importantForAccessibility="no" android:tint="@color/allowance_accent" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginStart="14dp" android:layout_marginEnd="8dp" android:orientation="vertical">
+                    <TextView style="@style/StrideWorkspaceToolTitle" android:text="@string/allowance_title" />
+                    <TextView style="@style/StrideWorkspaceToolDescription" android:text="@string/allowance_description" />
+                </LinearLayout>
+                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_workspace_arrow"
+                    android:importantForAccessibility="no" android:tint="@color/workspace_icon" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/videos_card"
+                style="@style/StrideWorkspaceTool" android:visibility="gone">
+                <ImageView style="@style/StrideWorkspaceToolIcon"
+                    android:background="@drawable/bg_workspace_avatar" android:src="@drawable/ic_workspace_video"
+                    android:importantForAccessibility="no" android:tint="@color/workspace_accent" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:layout_marginStart="14dp" android:orientation="vertical">
+                    <TextView style="@style/StrideWorkspaceToolTitle" android:text="@string/video_title" />
+                    <TextView style="@style/StrideWorkspaceToolDescription" android:text="@string/video_description" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout

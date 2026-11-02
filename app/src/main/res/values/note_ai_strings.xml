@@ -64,6 +64,16 @@
     <string name="note_ai_busy_elsewhere">This notebook is processing another request. Wait a moment and refresh.</string>
     <string name="note_ai_pdf_unavailable">This PDF could not be opened. It may have been removed. Refresh and try again.</string>
     <string name="note_ai_request_failed">The request could not finish. Refresh or try again.</string>
+    <string name="note_ai_timeout">The AI took too long to respond. Your question is still available to retry.</string>
+    <string name="note_ai_backend_unavailable">The notebook service could not respond. Try again shortly.</string>
+    <string name="note_ai_stream_interrupted">The connection ended before the answer finished. Retry your question to recover a saved answer or generate it again.</string>
+    <string name="note_ai_provider_unavailable">The AI service could not complete this request. Try again shortly.</string>
+    <string name="note_ai_model_unavailable">The configured AI model is unavailable. Ask your administrator to check the Gemini model setting.</string>
+    <string name="note_ai_request_invalid">Gemini rejected the request settings. Ask your administrator to check the Notes function and model configuration.</string>
+    <string name="note_ai_response_incomplete">The AI did not return a complete answer. Retry your question.</string>
+    <string name="note_ai_receiving">Generating answer\u2026</string>
+    <string name="note_ai_saving_answer">Saving answer\u2026</string>
+    <string name="note_ai_partial_answer">Incomplete answer. Verify it against your sources and retry your question.</string>
     <string name="note_ai_pdf_page">PDF page %1$d</string>
     <string name="note_ai_no_google">Use your regular Stride account. Google sign-in is optional.</string>
     <string name="note_ai_notebook_label">NOTEBOOK</string>

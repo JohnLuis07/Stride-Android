@@ -28,6 +28,7 @@ import org.json.JSONObject;
 public final class NotesScreen implements FeatureScreen {
     private final ComponentActivity activity;
     private final ScreenNotesBinding binding;
+    private final LoadingView loadingView;
     private final NotesViewModel viewModel;
     private final Observer<NotesState> observer = this::render;
     private final TextWatcher searchWatcher = new TextWatcher() {
@@ -60,11 +61,12 @@ public final class NotesScreen implements FeatureScreen {
         viewModel = new ViewModelProvider(activity).get(
                 "notes:" + user.optString("id"), NotesViewModel.class);
         viewModel.configure(api, user.optString("id"));
+        loadingView = new LoadingView(activity, binding.getRoot(), viewModel::reload);
     }
 
     @Override
     public View root() {
-        return binding.getRoot();
+        return loadingView.root();
     }
 
     public void bind() {
@@ -100,6 +102,7 @@ public final class NotesScreen implements FeatureScreen {
         binding.addButton.setOnClickListener(v -> showEditor(null));
         binding.refreshButton.setOnClickListener(v -> viewModel.reload());
         viewModel.state().observe(activity, observer);
+        loadingView.update(true, false);
         viewModel.reload();
         if (viewModel.hasDraft()) {
             showEditor(null);
@@ -124,7 +127,14 @@ public final class NotesScreen implements FeatureScreen {
             return;
         }
         adapter.setBusy(state.saving || state.loading);
-        adapter.submitList(state.notes);
+        if (state.loading || state.loadFailed) {
+            loadingView.update(state.loading, state.loadFailed);
+        }
+        adapter.submitList(state.notes, () -> {
+            if (!closed && viewModel.state().getValue() == state) {
+                loadingView.update(state.loading, state.loadFailed);
+            }
+        });
         binding.addButton.setEnabled(!state.saving && !state.loading);
         binding.refreshButton.setEnabled(!state.loading && !state.saving);
         binding.refreshButton.setText(state.loadFailed ? R.string.notes_retry : R.string.notes_refresh);

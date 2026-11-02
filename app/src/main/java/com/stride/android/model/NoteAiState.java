@@ -35,9 +35,17 @@ public final class NoteAiState {
     public static final class Message {
         public final String id, question, answer;
         public final List<Citation> citations;
+        public final boolean generating, incomplete;
         public Message(JSONObject value) {
             id = value.optString("id"); question = value.optString("question"); answer = value.optString("answer");
             citations = references(value.optJSONArray("citations"));
+            generating = false;
+            incomplete = false;
+        }
+        public Message(String id, String question, String answer, boolean generating, boolean incomplete) {
+            this.id = id; this.question = question; this.answer = answer;
+            this.generating = generating; this.incomplete = incomplete;
+            citations = Collections.emptyList();
         }
     }
 

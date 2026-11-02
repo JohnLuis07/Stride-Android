@@ -34,6 +34,7 @@ public final class NoteAiApi {
     private final ExecutorService transfers = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
     private final java.util.Set<File> temporaryFiles = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private SupabaseApi.RequestHandle chatStream;
     private volatile boolean closed;
 
     public NoteAiApi(Context context, SupabaseApi api) {
@@ -44,6 +45,20 @@ public final class NoteAiApi {
     public void call(JSONObject body, SupabaseApi.JsonCallback callback) {
         if (!closed) api.invokeFunction("notes-ai", body, (value, error) -> {
             if (!closed) callback.done(value, error);
+        });
+    }
+
+    public void stream(JSONObject body, SupabaseApi.StreamCallback callback) {
+        if (closed) return;
+        if (chatStream != null) chatStream.cancel();
+        chatStream = api.streamFunction("notes-ai", body, new SupabaseApi.StreamCallback() {
+            @Override public void event(String name, JSONObject value) {
+                if (!closed) callback.event(name, value);
+            }
+            @Override public void done(JSONObject value, String error) {
+                chatStream = null;
+                if (!closed) callback.done(value, error);
+            }
         });
     }
 
@@ -202,6 +217,7 @@ public final class NoteAiApi {
 
     public void close() {
         closed = true;
+        if (chatStream != null) { chatStream.cancel(); chatStream = null; }
         transfers.shutdownNow();
         main.removeCallbacksAndMessages(null);
         for (File file : temporaryFiles) discard(file);
@@ -224,6 +240,13 @@ public final class NoteAiApi {
             case "SESSION_EXPIRED": case SupabaseApi.SESSION_EXPIRED: return R.string.auth_session_expired;
             case "ACCOUNT_LINK_REQUIRED": return R.string.auth_migration_required;
             case "SETUP_REQUIRED": case "AI_SETUP_REQUIRED": return R.string.note_ai_setup_required;
+            case "AI_TIMEOUT": case "REQUEST_TIMEOUT": return R.string.note_ai_timeout;
+            case "BACKEND_TIMEOUT": case "BACKEND_UNAVAILABLE": return R.string.note_ai_backend_unavailable;
+            case "AI_STREAM_INTERRUPTED": return R.string.note_ai_stream_interrupted;
+            case "AI_PROVIDER_UNAVAILABLE": case "AI_REQUEST_FAILED": return R.string.note_ai_provider_unavailable;
+            case "AI_MODEL_UNAVAILABLE": return R.string.note_ai_model_unavailable;
+            case "AI_REQUEST_INVALID": return R.string.note_ai_request_invalid;
+            case "AI_RESPONSE_INVALID": case "AI_RESPONSE_INCOMPLETE": return R.string.note_ai_response_incomplete;
             case "DAILY_LIMIT": case "AI_RATE_LIMIT": return R.string.note_ai_rate_limit;
             case "SOURCE_LIMIT": return R.string.note_ai_source_limit;
             case "SELECTION_LIMIT": return R.string.note_ai_selection_limit;
